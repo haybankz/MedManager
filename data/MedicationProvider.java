@@ -20,7 +20,7 @@ public class MedicationProvider extends ContentProvider{
     private MedicationDbHelper medicationDbHelper;
     private static final int MEDICATIONS = 1000;
     private static  final int MEDICATIONS_ID = 1001;
-    private static final String MEDICATIONS_AUTHORITY = "com.haybankz.mynotekeeper";
+    private static final String MEDICATIONS_AUTHORITY = "com.haybankz.medmanager";
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -87,7 +87,7 @@ public class MedicationProvider extends ContentProvider{
         switch(match){
             case MEDICATIONS:
                 getContext().getContentResolver().notifyChange(uri, null);
-                return insertNote(uri, values);
+                return insertMedication(uri, values);
 
             default:
                 throw  new IllegalArgumentException("Insertion is not supported for: "+uri);
@@ -147,7 +147,7 @@ public class MedicationProvider extends ContentProvider{
 
     }
 
-    private Uri insertNote(Uri uri, ContentValues values){
+    private Uri insertMedication(Uri uri, ContentValues values){
 
         SQLiteDatabase database = medicationDbHelper.getWritableDatabase();
         long newRowId = database.insert(MedicationEntry.TABLE_NAME, null, values);

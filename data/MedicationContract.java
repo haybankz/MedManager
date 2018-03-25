@@ -33,9 +33,8 @@ public class MedicationContract {
 
         public final static String COLUMN_NAME_NULLABLE = null;
 
-
-
         public final static Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_MEDICATIONS);
+
 
 
 
