@@ -1,4 +1,4 @@
-package com.haybankz.medmanager.data;
+package com.haybankz.medmanager.data.medication;
 
 
 import android.net.Uri;

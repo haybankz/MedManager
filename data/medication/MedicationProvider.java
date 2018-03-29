@@ -1,4 +1,4 @@
-package com.haybankz.medmanager.data;
+package com.haybankz.medmanager.data.medication;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.haybankz.medmanager.data.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.data.MedicationDbHelper;
 
 /**
  * Created by LENOVO on 3/21/2018.
@@ -51,14 +51,14 @@ public class MedicationProvider extends ContentProvider{
         switch(match){
 
             case MEDICATIONS:
-                cursor = database.query(MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(MedicationContract.MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
 
             case MEDICATIONS_ID:
-                selection = MedicationEntry._ID +"=?";
+                selection = MedicationContract.MedicationEntry._ID +"=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                cursor = database.query(MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(MedicationContract.MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
 
@@ -103,14 +103,14 @@ public class MedicationProvider extends ContentProvider{
         int result;
         switch (match){
             case MEDICATIONS:
-                result = database.delete(MedicationEntry.TABLE_NAME, selection, selectionArgs);
+                result = database.delete(MedicationContract.MedicationEntry.TABLE_NAME, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
             case MEDICATIONS_ID:
-                selection = MedicationEntry._ID +"=?";
+                selection = MedicationContract.MedicationEntry._ID +"=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                result = database.delete(MedicationEntry.TABLE_NAME, selection, selectionArgs);
+                result = database.delete(MedicationContract.MedicationEntry.TABLE_NAME, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
@@ -129,14 +129,14 @@ public class MedicationProvider extends ContentProvider{
 
         switch(match){
             case MEDICATIONS:
-                result = database.update(MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
+                result = database.update(MedicationContract.MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
             case MEDICATIONS_ID:
-                selection = MedicationEntry._ID + "=?";
+                selection = MedicationContract.MedicationEntry._ID + "=?";
                 selectionArgs = new String[]{ String.valueOf(ContentUris.parseId(uri))};
-                result = database.update(MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
+                result = database.update(MedicationContract.MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
@@ -150,7 +150,7 @@ public class MedicationProvider extends ContentProvider{
     private Uri insertMedication(Uri uri, ContentValues values){
 
         SQLiteDatabase database = medicationDbHelper.getWritableDatabase();
-        long newRowId = database.insert(MedicationEntry.TABLE_NAME, null, values);
+        long newRowId = database.insert(MedicationContract.MedicationEntry.TABLE_NAME, null, values);
         if(newRowId == -1){
             Toast.makeText(getContext(), "Failed to insert row for: " + uri, Toast.LENGTH_LONG).show();
             return null;

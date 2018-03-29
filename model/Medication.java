@@ -1,5 +1,7 @@
 package com.haybankz.medmanager.model;
 
+import com.haybankz.medmanager.util.DateTimeUtils;
+
 /**
  * Created by LENOVO on 3/25/2018.
  */
@@ -84,6 +86,6 @@ public class Medication {
     public String toString(){
         return "Medication = id: " +mId +"\n name: "+ mName +"\n description: "
                 +mDescription + "\n frequency: " + mFrequency +"\n startdate: "
-                +mStartDateTime +"\n enddate: "+ mEndDateTime;
+                + DateTimeUtils.getDateTimeString(mStartDateTime) +"\n enddate: "+ DateTimeUtils.getDateTimeString(mEndDateTime);
     }
 }

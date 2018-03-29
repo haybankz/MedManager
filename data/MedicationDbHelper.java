@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.haybankz.medmanager.data.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
 
 /**
  * Created by LENOVO on 3/21/2018.
@@ -20,7 +20,7 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
 
     private static final String COMMA_SEP = ",";
 
-    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE "+ MedicationEntry.TABLE_NAME + " ( " +
+    private static final String SQL_CREATE_MEDICATION_ENTRIES = "CREATE TABLE "+ MedicationEntry.TABLE_NAME + " ( " +
             MedicationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             MedicationEntry.COLUMN_MEDICATION_NAME + TEXT_TYPE + " NOT NULL"+ COMMA_SEP +
             MedicationEntry.COLUMN_MEDICATION_DESCRIPTION + TEXT_TYPE + " NOT NULL"+ COMMA_SEP +
@@ -44,7 +44,7 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_MEDICATION_ENTRIES);
 
     }
 

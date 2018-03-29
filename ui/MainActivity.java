@@ -1,9 +1,10 @@
-package com.haybankz.medmanager;
+package com.haybankz.medmanager.ui;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
@@ -23,11 +24,16 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 
-import com.haybankz.medmanager.data.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.AlarmReceiver;
+import com.haybankz.medmanager.R;
+import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.model.Medication;
+import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.DateTimeUtils;
+import com.haybankz.medmanager.util.MedicationDbUtils;
 
 import java.util.Calendar;
-
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -60,9 +66,11 @@ public class MainActivity extends AppCompatActivity {
 
     private DatePickerDialog mEndDatePickerDialog;
     private TimePickerDialog mEndTimePickerDialog;
-    private TimePicker mStartTimePicker;
-    private TimePicker mEndTimePicker;
+//    private TimePicker mStartTimePicker;
+//    private TimePicker mEndTimePicker;
 
+    private long mStartDateTimeInMillis = 0l;
+    private long mEndDateTimeInMillis = 0l;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,16 +107,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    setUpStartDateAndTimePickerDialog();
-    setUpEndDateAndTimePickerDialog();
 
 
+
+
+    List<Medication> meds = MedicationDbUtils.getAllMedications(mContext);
+
+    if(meds != null) {
+        for (Medication m : meds) {
+            Log.e(TAG, "onCreate: " + m.toString());
+        }
+    }
 
         mStartDateFab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
+                setUpStartDateAndTimePickerDialog();
                 mStartDatePickerDialog.show();
             }
         });
@@ -122,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                setUpEndDateAndTimePickerDialog();
                 mEndDatePickerDialog.show();
             }
         });
@@ -144,51 +161,64 @@ public class MainActivity extends AppCompatActivity {
 
     public void addMedication(){
 
-        DatePicker startDatePicker = mStartDatePickerDialog.getDatePicker();
-        DatePicker endDatePicker = mEndDatePickerDialog.getDatePicker();
-        int sYear = startDatePicker.getYear(), sMonth = startDatePicker.getMonth(),
-                sDay = startDatePicker.getDayOfMonth(), sHour = 0, sMinute = 0;
+//        if(mStartDatePickerDialog != null && mEndDatePickerDialog != null) {
 
-        int eYear = endDatePicker.getYear(), eMonth = endDatePicker.getMonth(),
-                eDay = endDatePicker.getDayOfMonth(), eHour = 0, eMinute = 0;
+//            DatePicker startDatePicker = mStartDatePickerDialog.getDatePicker();
+//            DatePicker endDatePicker = mEndDatePickerDialog.getDatePicker();
+//
+//            int sYear = startDatePicker.getYear(), sMonth = startDatePicker.getMonth(),
+//                    sDay = startDatePicker.getDayOfMonth(), sHour = 0, sMinute = 0;
+//
+//            int eYear = endDatePicker.getYear(), eMonth = endDatePicker.getMonth(),
+//                    eDay = endDatePicker.getDayOfMonth(), eHour = 0, eMinute = 0;
+//
+//            if (mStartTimePicker != null) {
+//                sHour = mStartTimePicker.getCurrentHour();
+//                sMinute = mStartTimePicker.getCurrentMinute();
+//            }
+//
+//            if (mEndTimePicker != null) {
+//                eHour = mEndTimePicker.getCurrentHour();
+//                eMinute = mEndTimePicker.getCurrentMinute();
+//            }
 
-        if(mStartTimePicker != null ){
-            sHour = mStartTimePicker.getCurrentHour();
-            sMinute = mStartTimePicker.getCurrentMinute();
-        }
+            String name = mNameEditText.getText().toString().trim();
+            String description = mDescriptionEditText.getText().toString().trim();
+            int frequency = mFrequencySpinner.getSelectedItemPosition() + 1;
 
-        if(mEndTimePicker != null){
-            eHour = mEndTimePicker.getCurrentHour();
-            eMinute = mEndTimePicker.getCurrentMinute();
-        }
+//            long startDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(sYear, sMonth, sDay, sHour, sMinute);
+//            long endDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(eYear, eMonth, eDay, eHour, eMinute);
 
-        String name = mNameEditText.getText().toString().trim();
-        String description = mDescriptionEditText.getText().toString().trim();
+            ContentValues contentValues = new ContentValues();
 
-        long startDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(sYear, sMonth, sDay, sHour, sMinute);
-        long endDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(eYear, eMonth, eDay, eHour, eMinute);
+            if (!(TextUtils.isEmpty(name) || TextUtils.isEmpty(description) || mStartDateTimeInMillis == 0L || mEndDateTimeInMillis == 0L )) {
 
-        ContentValues contentValues = new ContentValues();
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, frequency);
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, mStartDateTimeInMillis);
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, mEndDateTimeInMillis);
 
-        if(!(TextUtils.isEmpty(name) || TextUtils.isEmpty(description))) {
+                Log.e(TAG, "addMedication: " + contentValues.toString());
+                Uri medicationUri = MedicationDbUtils.saveMedication(mContext, contentValues);
 
-            contentValues.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
-            contentValues.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
-            contentValues.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, mFrequencySpinner.getSelectedItemPosition() + 1);
-            contentValues.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, startDateTimeInMillis );
-            contentValues.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, endDateTimeInMillis);
+                if (medicationUri != null) {
+                    Toast.makeText(mContext, "Medication created :" + medicationUri.getPath(), Toast.LENGTH_SHORT).show();
+//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
+//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.DAY_IN_MILLIS / frequency );
 
-            Log.e(TAG, "addMedication: " + contentValues.toString());
-            Uri medicationUri = getContentResolver().insert(MedicationEntry.CONTENT_URI, contentValues);
+                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
+                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
 
-            if(medicationUri != null){
-                Toast.makeText(mContext, "Medication created :" + medicationUri.getPath(), Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
             }
-
-        }else{
-            Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
-        }
-
+//        }else{
+//            Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
+//
+//        }
 
     }
 
@@ -215,11 +245,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        mStartTimePicker =  view;
-                        long dateTimeInMilliseconds = DateTimeUtils.getDateTimeInMilliseconds(year,
+//                        mStartTimePicker =  view;
+                        mStartDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(year,
                                 month, dayOfMonth, hourOfDay, minute);
 
-                        mStartDateTextView.setText(DateTimeUtils.getDateTimeString(dateTimeInMilliseconds));
+                        mStartDateTextView.setText(DateTimeUtils.getDateTimeString(mStartDateTimeInMillis));
 
                     }
                 }, cHour, cMinute, false);
@@ -256,12 +286,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        mEndTimePicker = view;
+//                        mEndTimePicker = view;
 
-                        long dateTimeInMilliseconds = DateTimeUtils.getDateTimeInMilliseconds(year,
+                        mEndDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(year,
                                 month, dayOfMonth, hourOfDay, minute);
 
-                        mEndDateTextView.setText(DateTimeUtils.getDateTimeString(dateTimeInMilliseconds));
+                        mEndDateTextView.setText(DateTimeUtils.getDateTimeString(mEndDateTimeInMillis));
+
 
                     }
                 }, cHour, cMinute, false);
