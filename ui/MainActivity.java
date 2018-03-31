@@ -207,8 +207,8 @@ public class MainActivity extends AppCompatActivity {
 //                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
 //                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.DAY_IN_MILLIS / frequency );
 
-                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
+//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
+//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
 
                 }
 

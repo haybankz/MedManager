@@ -12,8 +12,8 @@ import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntr
 
 public class MedicationDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "med_manager.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "med_manager.db";
 
 
     private static final String TEXT_TYPE = " TEXT";
@@ -27,10 +27,11 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
             MedicationEntry.COLUMN_MEDICATION_FREQUENCY + " INTEGER," +
             MedicationEntry.COLUMN_MEDICATION_START_DATE + " INTEGER,"  +
             MedicationEntry.COLUMN_MEDICATION_END_DATE + " INTEGER," +
+            MedicationEntry.COLUMN_MEDICATION_ACTIVE + " INTEGER NOT NULL DEFAULT 1, " +
             MedicationEntry.COLUMN_MEDICATION_MONTH + " INTEGER" +
 
             " )";
-    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXIST "+ MedicationEntry.TABLE_NAME;
+    private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "+ MedicationEntry.TABLE_NAME;
 
 
     public MedicationDbHelper(Context context) {

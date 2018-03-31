@@ -9,6 +9,7 @@ import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.MedicationDbUtils;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -38,6 +39,7 @@ public class BootReceiver extends BroadcastReceiver {
                     int mFrequency = med.getFrequency();
                     long mStartDate = med.getStartDateTime();
                     long mEndDate = med.getEndDateTime();
+                    boolean active = med.getActive();
 
                     long repeatTime;
 
@@ -68,7 +70,7 @@ public class BootReceiver extends BroadcastReceiver {
 
                     }
 
-                    if(repeatTime > 0)
+                    if(active || mEndDate < Calendar.getInstance().getTimeInMillis())
                     mAlarmReceiver.setRepeatAlarm(context, mStartDate, id, repeatTime);
                     else{
                         mAlarmReceiver.cancelAlarm(context, id);

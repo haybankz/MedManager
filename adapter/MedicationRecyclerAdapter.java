@@ -4,20 +4,24 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.haybankz.medmanager.PicassoCircleTransformation;
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.DateTimeUtils;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MedicationRecyclerAdapter extends RecyclerView.Adapter<MedicationRecyclerAdapter.MedicationViewHolder>{
 
@@ -99,7 +103,7 @@ public class MedicationRecyclerAdapter extends RecyclerView.Adapter<MedicationRe
             mIntervalTextView = itemView.findViewById(R.id.tv_med_interval);
             mStartDateTextView = itemView.findViewById(R.id.tv_med_start_date);
             mEndDateTextView = itemView.findViewById(R.id.tv_med_end_date);
-            mMedTypeImageView = itemView.findViewById(R.id.img_med);
+            mMedTypeImageView =  itemView.findViewById(R.id.img_med_type);
             mMedActiveImageView = itemView.findViewById(R.id.img_med_active);
 
         }
@@ -141,7 +145,20 @@ public class MedicationRecyclerAdapter extends RecyclerView.Adapter<MedicationRe
             mStartDateTextView.setText(startDate);
             mEndDateTextView.setText(endDate);
 
-            mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
+            Picasso.with(context)
+                    .load("file:///android_asset/flags/NGN.png")
+                    .networkPolicy(NetworkPolicy.OFFLINE)
+                    .transform(new PicassoCircleTransformation())
+                    .fit()
+                    .noFade()
+                    .into(mMedTypeImageView);
+
+
+            if(medication.getActive()) {
+                mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
+            }else{
+                mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, android.R.color.darker_gray));
+                }
 
         }
 

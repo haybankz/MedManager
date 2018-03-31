@@ -121,6 +121,7 @@ public class AlarmReceiver extends BroadcastReceiver{
             mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startDateTimeInMillis, frequency, mPendingIntent);
 
         }else{
+
             while(Calendar.getInstance().getTimeInMillis() > startDateTimeInMillis ){
 
                 startDateTimeInMillis += frequency;

@@ -14,6 +14,7 @@ public class Medication {
     private int mFrequency;
     private long mStartDateTime;
     private long mEndDateTime;
+    private boolean mActive;
 
     public Medication() {
     }
@@ -26,13 +27,15 @@ public class Medication {
         this.mEndDateTime = mEndDateTime;
     }
 
-    public Medication(long mId, String mName, String mDescription, int mFrequency, long mStartDateTime, long mEndDateTime) {
+    public Medication(long mId, String mName, String mDescription, int mFrequency, long mStartDateTime,
+                      long mEndDateTime, boolean mActive) {
         this.mId = mId;
         this.mName = mName;
         this.mDescription = mDescription;
         this.mFrequency = mFrequency;
         this.mStartDateTime = mStartDateTime;
         this.mEndDateTime = mEndDateTime;
+        this.mActive = mActive;
     }
 
     public long getId() {
@@ -83,9 +86,21 @@ public class Medication {
         this.mEndDateTime = mEndDateTime;
     }
 
+    public void setActive(boolean mActive){
+        this.mActive = mActive;
+    }
+
+    public boolean getActive(){
+        return mActive;
+    }
+
     public String toString(){
-        return "Medication = id: " +mId +"\n name: "+ mName +"\n description: "
-                +mDescription + "\n frequency: " + mFrequency +"\n startdate: "
-                + DateTimeUtils.getDateTimeString(mStartDateTime) +"\n enddate: "+ DateTimeUtils.getDateTimeString(mEndDateTime);
+        return "Medication = id: " +mId +
+                "\n name: "+ mName +
+                "\n description: " +mDescription +
+                "\n frequency: " + mFrequency +
+                "\n startdate: " + DateTimeUtils.getDateTimeString(mStartDateTime) +
+                "\n enddate: " + DateTimeUtils.getDateTimeString(mEndDateTime) +
+                "\n active: " + mActive;
     }
 }

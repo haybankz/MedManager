@@ -14,7 +14,7 @@ public class MedicationContract {
 
     public static final String PATH_MEDICATIONS = "medications";
 
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://com.haybankz.medmanager/");
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://com.haybankz.medmanager/");
 
     public static final class MedicationEntry implements BaseColumns {
 
@@ -27,6 +27,7 @@ public class MedicationContract {
         public final static String COLUMN_MEDICATION_START_DATE = "start_date";
         public final static String COLUMN_MEDICATION_END_DATE = "end_date";
         public final static String COLUMN_MEDICATION_MONTH = "month";
+        public final static String COLUMN_MEDICATION_ACTIVE = "active";
 
 
         public final static String COLUMN_MEDICATION_CATEGORY= "category";

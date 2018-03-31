@@ -37,7 +37,8 @@ public class MedicationDbUtils {
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
-                MedicationEntry.COLUMN_MEDICATION_END_DATE
+                MedicationEntry.COLUMN_MEDICATION_END_DATE,
+                MedicationEntry.COLUMN_MEDICATION_ACTIVE
         };
 
         String selection = MedicationEntry.COLUMN_MEDICATION_NAME + " like ?";
@@ -56,8 +57,9 @@ public class MedicationDbUtils {
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
+                boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1;
 
-                Medication medication = new Medication(id, name, description, frequency, startDate, endDate);
+                Medication medication = new Medication(id, name, description, frequency, startDate, endDate, active);
 
                 medications.add(medication);
             }
@@ -80,7 +82,8 @@ public class MedicationDbUtils {
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
-                MedicationEntry.COLUMN_MEDICATION_END_DATE
+                MedicationEntry.COLUMN_MEDICATION_END_DATE,
+                MedicationEntry.COLUMN_MEDICATION_ACTIVE
         };
 
 
@@ -94,8 +97,9 @@ public class MedicationDbUtils {
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
+                boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1;
 
-                medication = new Medication(id, name, description, frequency, startDate, endDate);
+                medication = new Medication(id, name, description, frequency, startDate, endDate, active);
 
 
             }
@@ -116,7 +120,8 @@ public class MedicationDbUtils {
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
-                MedicationEntry.COLUMN_MEDICATION_END_DATE
+                MedicationEntry.COLUMN_MEDICATION_END_DATE,
+                MedicationEntry.COLUMN_MEDICATION_ACTIVE
         };
 
         String sortOrder = MedicationEntry._ID + " DESC";
@@ -132,8 +137,10 @@ public class MedicationDbUtils {
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
+                boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1 ;
 
-                Medication medication = new Medication(id, name, description, frequency, startDate, endDate);
+
+                Medication medication = new Medication(id, name, description, frequency, startDate, endDate, active);
 
                 medications.add(medication);
             }

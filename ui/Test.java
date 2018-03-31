@@ -26,13 +26,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.haybankz.medmanager.ClickListener;
 import com.haybankz.medmanager.MedicationLoader;
+import com.haybankz.medmanager.PicassoCircleTransformation;
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.RecyclerTouchListener;
 import com.haybankz.medmanager.adapter.MedicationRecyclerAdapter;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -45,6 +49,10 @@ public class Test extends AppCompatActivity
 
     MedicationRecyclerAdapter mMedicationRecyclerAdapter;
 
+    TextView mNameTextView;
+    TextView mEmailTextView;
+    ImageView mProfilePicImageView;
+
     private int MED_LOADER = 0;
 
     @Override
@@ -53,7 +61,6 @@ public class Test extends AppCompatActivity
         setContentView(R.layout.activity_test);
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         DrawerLayout drawer =  findViewById(R.id.drawer_layout);
@@ -65,6 +72,35 @@ public class Test extends AppCompatActivity
         NavigationView navigationView =  findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View header = navigationView.getHeaderView(0);
+        mNameTextView = header.findViewById(R.id.tv_name);
+        mEmailTextView = header.findViewById(R.id.tv_email);
+        mProfilePicImageView = header.findViewById(R.id.img_profile_pics);
+
+
+        if(getIntent() != null){
+            Bundle bundle = getIntent().getExtras();
+            if(bundle != null) {
+                mNameTextView.setText(String.valueOf(bundle.get("display_name")));
+                mEmailTextView.setText(String.valueOf(bundle.get("email")));
+
+                Picasso.with(this)
+                        .load(String.valueOf(bundle.get("photo_url")))
+                        .transform(new PicassoCircleTransformation())
+                        .placeholder(R.drawable.ic_menu_send)
+                        .error(R.drawable.ic_menu_camera)
+                        .noFade()
+                        .into(mProfilePicImageView);
+//            bundle.get("display_name");
+//
+//            bundle.get("photo_url");
+//            bundle.get("given_name");
+//            bundle.get("family_name");
+//            bundle.get("id");
+            }
+
+            Toast.makeText(this, bundle.toString(), Toast.LENGTH_SHORT).show();
+        }
 
         FloatingActionButton fab =  findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -230,7 +266,10 @@ public class Test extends AppCompatActivity
 
             searchView.setPressed(true);
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_log_out) {
+
+            LoginActivity.mGoogleSignInClient.signOut();
+//            LoginActivity.mGoogleSignInClient.revokeAccess();
 
         } else if (id == R.id.nav_manage) {
 
