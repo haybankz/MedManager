@@ -1,4 +1,4 @@
-package com.haybankz.medmanager;
+package com.haybankz.medmanager.loader;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MedicationLoader extends AsyncTaskLoader<ArrayList<Medication>> {
 
-    Context mContext;
+    private Context mContext;
     int mId;
 
     public MedicationLoader(@NonNull Context context) {

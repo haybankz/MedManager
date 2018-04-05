@@ -2,8 +2,6 @@ package com.haybankz.medmanager.ui;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,24 +14,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.api.Status;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.haybankz.medmanager.R;
-
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -48,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    public static GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         GoogleSignInOptions mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
+//                .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()
                 .build();
 
@@ -97,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
 //    }
 
     void openMedicationActivity(GoogleSignInAccount account){
-        Intent loggedInIntent = new Intent(this, Test.class);
+        Intent loggedInIntent = new Intent(this, MainActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("display_name", account.getDisplayName());
         bundle.putString("email", account.getEmail());
@@ -107,8 +93,11 @@ public class LoginActivity extends AppCompatActivity {
         bundle.putString("id", account.getId());
 
         loggedInIntent.putExtras(bundle);
-
+//
         startActivity(loggedInIntent);
+
+//        Intent logg = new Intent(this, MainActivity.class);
+//        startActivity(logg);
     }
 
     @Override
@@ -120,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null){
-            Toast.makeText(this, account.toString() +"....already logged in", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, account.toString() +"....already logged in", Toast.LENGTH_SHORT).show();
             openMedicationActivity(account);
 
         }
@@ -147,8 +136,8 @@ public class LoginActivity extends AppCompatActivity {
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     Log.e(TAG, "handleSignInResult: Account: "+account.toString() );
 
-                    Toast.makeText(LoginActivity.this,"handleSignInResult: Account: "
-                            + account.getDisplayName() , Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(LoginActivity.this,"handleSignInResult: Account: "
+//                            + account.getDisplayName() , Toast.LENGTH_SHORT).show();
 
                     openMedicationActivity(account);
 
@@ -162,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
         completedTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(LoginActivity.this, "Google sign up failed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(LoginActivity.this, "Google sign up failed", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "onFailure: ....here\n\n\n\n", e );
             }
         });

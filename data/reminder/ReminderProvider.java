@@ -1,4 +1,4 @@
-package com.haybankz.medmanager.data.medication;
+package com.haybankz.medmanager.data.reminder;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -10,26 +10,27 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.haybankz.medmanager.data.MedicationDbHelper;
+import com.haybankz.medmanager.model.Medication;
 
 /**
  * Created by LENOVO on 3/21/2018.
  */
 
-public class MedicationProvider extends ContentProvider{
+public class ReminderProvider extends ContentProvider{
 
     private MedicationDbHelper medicationDbHelper;
-    private static final int MEDICATIONS = 1000;
-    private static  final int MEDICATIONS_ID = 1001;
-    private static final String MEDICATIONS_AUTHORITY = "com.haybankz.medmanager.medication";
+    private static final int REMINDERS = 2000;
+    private static  final int REMINDERS_ID = 2001;
+    private static final String REMINDERS_AUTHORITY = "com.haybankz.medmanager.reminder";
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static{
 
-        sUriMatcher.addURI(MEDICATIONS_AUTHORITY, MedicationContract.PATH_MEDICATIONS, MEDICATIONS);
+        sUriMatcher.addURI(REMINDERS_AUTHORITY, ReminderContract.PATH_REMINDERS, REMINDERS);
 
 
-        sUriMatcher.addURI(MEDICATIONS_AUTHORITY, MedicationContract.PATH_MEDICATIONS + "/#", MEDICATIONS_ID);
+        sUriMatcher.addURI(REMINDERS_AUTHORITY, ReminderContract.PATH_REMINDERS + "/#", REMINDERS_ID);
 
 
 
@@ -50,15 +51,15 @@ public class MedicationProvider extends ContentProvider{
         int match = sUriMatcher.match(uri);
         switch(match){
 
-            case MEDICATIONS:
-                cursor = database.query(MedicationContract.MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            case REMINDERS:
+                cursor = database.query(ReminderContract.ReminderEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
 
-            case MEDICATIONS_ID:
-                selection = MedicationContract.MedicationEntry._ID +"=?";
+            case REMINDERS_ID:
+                selection = ReminderContract.ReminderEntry._ID +"=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                cursor = database.query(MedicationContract.MedicationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = database.query(ReminderContract.ReminderEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
 
@@ -85,8 +86,8 @@ public class MedicationProvider extends ContentProvider{
 
         int match = sUriMatcher.match(uri);
         switch(match){
-            case MEDICATIONS:
-//                getContext().getContentResolver().notifyChange(uri, null);
+            case REMINDERS:
+                getContext().getContentResolver().notifyChange(uri, null);
                 return insertMedication(uri, values);
 
             default:
@@ -102,15 +103,15 @@ public class MedicationProvider extends ContentProvider{
 
         int result;
         switch (match){
-            case MEDICATIONS:
-                result = database.delete(MedicationContract.MedicationEntry.TABLE_NAME, selection, selectionArgs);
+            case REMINDERS:
+                result = database.delete(ReminderContract.ReminderEntry.TABLE_NAME, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
-            case MEDICATIONS_ID:
-                selection = MedicationContract.MedicationEntry._ID +"=?";
+            case REMINDERS_ID:
+                selection = ReminderContract.ReminderEntry._ID +"=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                result = database.delete(MedicationContract.MedicationEntry.TABLE_NAME, selection, selectionArgs);
+                result = database.delete(ReminderContract.ReminderEntry.TABLE_NAME, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
@@ -128,15 +129,15 @@ public class MedicationProvider extends ContentProvider{
         int result;
 
         switch(match){
-            case MEDICATIONS:
-                result = database.update(MedicationContract.MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
+            case REMINDERS:
+                result = database.update(ReminderContract.ReminderEntry.TABLE_NAME, values, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
-            case MEDICATIONS_ID:
-                selection = MedicationContract.MedicationEntry._ID + "=?";
+            case REMINDERS_ID:
+                selection = ReminderContract.ReminderEntry._ID + "=?";
                 selectionArgs = new String[]{ String.valueOf(ContentUris.parseId(uri))};
-                result = database.update(MedicationContract.MedicationEntry.TABLE_NAME, values, selection, selectionArgs);
+                result = database.update(ReminderContract.ReminderEntry.TABLE_NAME, values, selection, selectionArgs);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return result;
 
@@ -150,7 +151,7 @@ public class MedicationProvider extends ContentProvider{
     private Uri insertMedication(Uri uri, ContentValues values){
 
         SQLiteDatabase database = medicationDbHelper.getWritableDatabase();
-        long newRowId = database.insert(MedicationContract.MedicationEntry.TABLE_NAME, null, values);
+        long newRowId = database.insert(ReminderContract.ReminderEntry.TABLE_NAME, null, values);
         if(newRowId == -1){
             Toast.makeText(getContext(), "Failed to insert row for: " + uri, Toast.LENGTH_LONG).show();
             return null;

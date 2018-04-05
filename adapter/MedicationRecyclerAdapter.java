@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.haybankz.medmanager.PicassoCircleTransformation;
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.util.Constant;
@@ -154,7 +153,7 @@ public class MedicationRecyclerAdapter extends RecyclerView.Adapter<MedicationRe
                     .into(mMedTypeImageView);
 
 
-            if(medication.getActive()) {
+            if(medication.isActive()) {
                 mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
             }else{
                 mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, android.R.color.darker_gray));

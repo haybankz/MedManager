@@ -14,7 +14,7 @@ public class MedicationContract {
 
     public static final String PATH_MEDICATIONS = "medications";
 
-    private static final Uri BASE_CONTENT_URI = Uri.parse("content://com.haybankz.medmanager/");
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://com.haybankz.medmanager.medication/");
 
     public static final class MedicationEntry implements BaseColumns {
 

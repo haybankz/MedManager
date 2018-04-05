@@ -1,313 +1,324 @@
 package com.haybankz.medmanager.ui;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.TimePickerDialog;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.Context;
-import android.net.Uri;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-
-import com.haybankz.medmanager.AlarmReceiver;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.haybankz.medmanager.adapter.MedicationRecyclerAdapter;
+import com.haybankz.medmanager.adapter.PicassoCircleTransformation;
 import com.haybankz.medmanager.R;
-import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.adapter.SimpleFragmentPagerAdapter;
+import com.haybankz.medmanager.listener.ClickListener;
+import com.haybankz.medmanager.listener.RecyclerTouchListener;
 import com.haybankz.medmanager.model.Medication;
-import com.haybankz.medmanager.util.Constant;
-import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.squareup.picasso.Picasso;
 
-import java.util.Calendar;
-import java.util.List;
+import java.util.ArrayList;
 
-
-public class MainActivity extends AppCompatActivity {
-
-    private String TAG = getClass().getName();
-    EditText mNameEditText;
-    EditText mDescriptionEditText;
-
-    Spinner mFrequencySpinner;
-
-    TextView mStartDateTextView;
-    TextView mEndDateTextView;
-
-    FloatingActionButton mStartDateFab;
-    FloatingActionButton mEndDateFab;
-
-    FloatingActionButton saveFab;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
+    LinearLayout mNoResultLayout;
+    TextView mNoResultFoundTextView;
+    RecyclerView mSearchRecyclerView;
 
-    private Context mContext = this;
-    private Activity mActivity = this;
+    MedicationRecyclerAdapter mMedicationRecyclerAdapter;
+    ViewPager viewPager;
+    TabLayout tabLayout;
 
+    MenuItem searchViewItem;
+    SearchView searchView;
 
+    TextView mNameTextView;
+    TextView mEmailTextView;
+    ImageView mProfilePicImageView;
 
-    private Calendar mCalendar;
+    GoogleSignInClient mGoogleSignInClient;
 
-    private DatePickerDialog mStartDatePickerDialog;
-    private TimePickerDialog mStartTimePickerDialog;
-
-    private DatePickerDialog mEndDatePickerDialog;
-    private TimePickerDialog mEndTimePickerDialog;
-//    private TimePicker mStartTimePicker;
-//    private TimePicker mEndTimePicker;
-
-    private long mStartDateTimeInMillis = 0l;
-    private long mEndDateTimeInMillis = 0l;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mNameEditText = findViewById(R.id.et_med_name);
-        mDescriptionEditText =  findViewById(R.id.et_med_descr);
-
-        mFrequencySpinner =  findViewById(R.id.spn_freq);
-
-        mStartDateTextView =  findViewById(R.id.tv_start_date);
-        mEndDateTextView =  findViewById(R.id.tv_end_date);
-
-        mStartDateFab =  findViewById(R.id.fabtn_start_date);
-        mEndDateFab =  findViewById(R.id.fabtn_end_date);
-
-        saveFab = findViewById(R.id.fbtn_save);
+        Toolbar toolbar =  findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
 
-        // to hide keyboard at the start  of activity, keyboard shows up cos first view in the activity is an editText
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        mFrequencySpinner = findViewById(R.id.spn_freq);
-        ArrayAdapter<CharSequence> aAdpt = ArrayAdapter.createFromResource(this, R.array.frequency_array, android.R.layout.simple_spinner_item);
-        aAdpt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mFrequencySpinner.setAdapter(aAdpt);
+        NavigationView navigationView =  findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
+        mNoResultLayout = findViewById(R.id.layout_no_result_found);
+        mNoResultFoundTextView = findViewById(R.id.tv_no_result_found);
 
-        mCalendar = Calendar.getInstance();
-        Long dateInMillis = mCalendar.getTimeInMillis();
-
-        mStartDateTextView.setText(DateTimeUtils.getDateTimeString(dateInMillis));
-
-
-
-
-
+        View header = navigationView.getHeaderView(0);
+        mNameTextView = header.findViewById(R.id.tv_name);
+        mEmailTextView = header.findViewById(R.id.tv_email);
+        mProfilePicImageView = header.findViewById(R.id.img_profile_pics);
 
 
-    List<Medication> meds = MedicationDbUtils.getAllMedications(mContext);
+        if(getIntent() != null){
+            Bundle bundle = getIntent().getExtras();
+            if(bundle != null) {
+                mNameTextView.setText(String.valueOf(bundle.get("display_name")));
+                mEmailTextView.setText(String.valueOf(bundle.get("email")));
 
-    if(meds != null) {
-        for (Medication m : meds) {
-            Log.e(TAG, "onCreate: " + m.toString());
+                Picasso.with(this)
+                        .load(String.valueOf(bundle.get("photo_url")))
+                        .transform(new PicassoCircleTransformation())
+                        .placeholder(R.drawable.ic_menu_send)
+                        .error(R.drawable.ic_menu_camera)
+                        .noFade()
+                        .into(mProfilePicImageView);
+
+            }
+
+        }
+
+        FloatingActionButton fab =  findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(MainActivity.this, AddMedicationActivity.class);
+
+                startActivity(intent);
+            }
+        });
+
+
+
+
+        viewPager = findViewById(R.id.view_pager);
+
+        SimpleFragmentPagerAdapter simpleFragmentPagerAdapter =
+                new SimpleFragmentPagerAdapter(this, getSupportFragmentManager());
+
+        viewPager.setAdapter(simpleFragmentPagerAdapter);
+
+
+        tabLayout = findViewById(R.id.sliding_tabs);
+
+        tabLayout.setupWithViewPager(viewPager);
+
+
+        mSearchRecyclerView = findViewById(R.id.recycler_search);
+
+        StaggeredGridLayoutManager staggeredGridLayoutManager =
+                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+
+        mSearchRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        mMedicationRecyclerAdapter = new MedicationRecyclerAdapter(MainActivity.this, new ArrayList<Medication>());
+
+        mSearchRecyclerView.setAdapter(mMedicationRecyclerAdapter);
+        mSearchRecyclerView.addItemDecoration(new DividerItemDecoration(mSearchRecyclerView.getContext(), StaggeredGridLayoutManager.VERTICAL));
+
+        mSearchRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, mSearchRecyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+
+                Toast.makeText(MainActivity.this, mMedicationRecyclerAdapter.getItem(position).toString(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+
+
+        GoogleSignInOptions mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, mGoogleSignInOptions);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
-        mStartDateFab.setOnClickListener(new View.OnClickListener() {
+
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        searchViewItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchViewItem.getActionView();
+        ImageView v =  searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
+        final TextView searchTextView = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchTextView.setBackgroundColor(getResources().getColor(R.color.white));
+        searchTextView.setTextColor(getResources().getColor(R.color.black));
+        searchTextView.setHintTextColor(getResources().getColor(R.color.darker_gray));
+
+
+
+        String searchFor = searchTextView.getText().toString();
+
+
+        if(!searchFor.isEmpty()){
+            searchView.setIconified(false);
+
+        }
+
+
+
+        searchView.setQueryHint("Search for medication");
+
+        searchView.setSubmitButtonEnabled(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+
+
+                return true;
+            }
+
 
             @Override
-            public void onClick(View v) {
+            public boolean onQueryTextChange(String newText) {
+                if(newText.isEmpty()){
 
-                setUpStartDateAndTimePickerDialog();
-                mStartDatePickerDialog.show();
-            }
-        });
+                    mNoResultLayout.setVisibility(View.GONE);
+                    mSearchRecyclerView.setVisibility(View.GONE);
+                    tabLayout.setVisibility(View.VISIBLE);
+                    viewPager.setVisibility(View.VISIBLE);
 
+                }else{
 
+                    ArrayList<Medication> medications = MedicationDbUtils.getMedicationsByName(MainActivity.this, newText);
+                    if(medications != null) {
 
-
-
-        mEndDateFab.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                setUpEndDateAndTimePickerDialog();
-                mEndDatePickerDialog.show();
-            }
-        });
+                        tabLayout.setVisibility(View.GONE);
+                        viewPager.setVisibility(View.GONE);
+                        mNoResultLayout.setVisibility(View.GONE);
 
 
+                        mMedicationRecyclerAdapter.addAll(medications);
+                        mMedicationRecyclerAdapter.notifyDataSetChanged();
+                        mSearchRecyclerView.setVisibility(View.VISIBLE);
+
+                    }else{
+
+                        mMedicationRecyclerAdapter.clear();
+
+                        tabLayout.setVisibility(View.GONE);
+                        viewPager.setVisibility(View.GONE);
+                        mSearchRecyclerView.setVisibility(View.GONE);
+                        mNoResultFoundTextView.setText("No record found for '" + newText + "'");
+                        mNoResultLayout.setVisibility(View.VISIBLE);
 
 
-        saveFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                addMedication();
-            }
-        });
+                    }
 
 
-
-    }
-
-
-    public void addMedication(){
-
-//        if(mStartDatePickerDialog != null && mEndDatePickerDialog != null) {
-
-//            DatePicker startDatePicker = mStartDatePickerDialog.getDatePicker();
-//            DatePicker endDatePicker = mEndDatePickerDialog.getDatePicker();
-//
-//            int sYear = startDatePicker.getYear(), sMonth = startDatePicker.getMonth(),
-//                    sDay = startDatePicker.getDayOfMonth(), sHour = 0, sMinute = 0;
-//
-//            int eYear = endDatePicker.getYear(), eMonth = endDatePicker.getMonth(),
-//                    eDay = endDatePicker.getDayOfMonth(), eHour = 0, eMinute = 0;
-//
-//            if (mStartTimePicker != null) {
-//                sHour = mStartTimePicker.getCurrentHour();
-//                sMinute = mStartTimePicker.getCurrentMinute();
-//            }
-//
-//            if (mEndTimePicker != null) {
-//                eHour = mEndTimePicker.getCurrentHour();
-//                eMinute = mEndTimePicker.getCurrentMinute();
-//            }
-
-            String name = mNameEditText.getText().toString().trim();
-            String description = mDescriptionEditText.getText().toString().trim();
-            int frequency = mFrequencySpinner.getSelectedItemPosition() + 1;
-
-//            long startDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(sYear, sMonth, sDay, sHour, sMinute);
-//            long endDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(eYear, eMonth, eDay, eHour, eMinute);
-
-            ContentValues contentValues = new ContentValues();
-
-            if (!(TextUtils.isEmpty(name) || TextUtils.isEmpty(description) || mStartDateTimeInMillis == 0L || mEndDateTimeInMillis == 0L )) {
-
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, frequency);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, mStartDateTimeInMillis);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, mEndDateTimeInMillis);
-
-                Log.e(TAG, "addMedication: " + contentValues.toString());
-                Uri medicationUri = MedicationDbUtils.saveMedication(mContext, contentValues);
-
-                if (medicationUri != null) {
-                    Toast.makeText(mContext, "Medication created :" + medicationUri.getPath(), Toast.LENGTH_SHORT).show();
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.DAY_IN_MILLIS / frequency );
-
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
 
                 }
 
-            } else {
-                Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
+                return false;
             }
-//        }else{
-//            Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
-//
-//        }
+        });
 
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
-    public void setUpStartDateAndTimePickerDialog(){
-
-        final int cYear, cMonth, cDay;
-        Log.d(TAG, "onClick: stardate fab clicked!!!!!");
-        final Calendar c = Calendar.getInstance();
-        cYear = c.get(Calendar.YEAR);
-        cMonth = c.get(Calendar.MONTH);
-        cDay = c.get(Calendar.DAY_OF_MONTH);
-
-        mStartDatePickerDialog = new DatePickerDialog(mContext,new OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
-
-
-                int cHour, cMinute;
-                mCalendar = Calendar.getInstance();
-                cHour = mCalendar.get(Calendar.HOUR_OF_DAY);
-                cMinute = mCalendar.get(Calendar.MINUTE);
-
-                mStartTimePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-//                        mStartTimePicker =  view;
-                        mStartDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(year,
-                                month, dayOfMonth, hourOfDay, minute);
-
-                        mStartDateTextView.setText(DateTimeUtils.getDateTimeString(mStartDateTimeInMillis));
-
-                    }
-                }, cHour, cMinute, false);
-
-
-
-
-                mStartTimePickerDialog.show();
-            }
-        }, cYear, cMonth, cDay);
-
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
-    private void setUpEndDateAndTimePickerDialog(){
-        final int cYear, cMonth, cDay;
-        Log.d(TAG, "onClick: stardate fab clicked!!!!!");
-        final Calendar c = Calendar.getInstance();
-        cYear = c.get(Calendar.YEAR);
-        cMonth = c.get(Calendar.MONTH);
-        cDay = c.get(Calendar.DAY_OF_MONTH);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-        mEndDatePickerDialog = new DatePickerDialog(mContext,new OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_search) {
+            return true;
+        }
 
-
-                int cHour, cMinute;
-                mCalendar = Calendar.getInstance();
-                cHour = mCalendar.get(Calendar.HOUR_OF_DAY);
-                cMinute = mCalendar.get(Calendar.MINUTE);
-
-                mEndTimePickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-//                        mEndTimePicker = view;
-
-                        mEndDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(year,
-                                month, dayOfMonth, hourOfDay, minute);
-
-                        mEndDateTextView.setText(DateTimeUtils.getDateTimeString(mEndDateTimeInMillis));
-
-
-                    }
-                }, cHour, cMinute, false);
-
-
-                mEndTimePickerDialog.show();
-            }
-        }, cYear, cMonth, cDay);
-
+        return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_add_med) {
+
+            Intent addMedicationIntent = new Intent(this, AddMedicationActivity.class);
+            startActivity(addMedicationIntent);
+
+            // Handle the camera action
+        } else if (id == R.id.nav_search) {
 
 
+            searchViewItem.expandActionView();
 
+        } else if (id == R.id.nav_log_out) {
 
+            mGoogleSignInClient.signOut();
 
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer =  findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
 }

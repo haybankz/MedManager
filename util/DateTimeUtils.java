@@ -25,4 +25,32 @@ public class DateTimeUtils {
 
         return String.format("%s%s", "", dateFormat.format(date));
     }
+
+    public static long getFrequencyInMilliseconds(int frequency){
+        long frequencyInMillis = 0L;
+
+        switch(frequency){
+            case Constant.INT_ONCE_A_DAY:
+                frequencyInMillis = Constant.DAY_IN_MILLIS / Constant.INT_ONCE_A_DAY;
+                break;
+
+            case Constant.INT_TWICE_A_DAY:
+                frequencyInMillis = Constant.DAY_IN_MILLIS / Constant.INT_TWICE_A_DAY;
+                break;
+
+            case Constant.INT_THRICE_A_DAY:
+                frequencyInMillis = Constant.DAY_IN_MILLIS / Constant.INT_THRICE_A_DAY;
+                break;
+
+            case Constant.INT_FOUR_TIMES_A_DAY:
+                frequencyInMillis = Constant.DAY_IN_MILLIS / Constant.INT_FOUR_TIMES_A_DAY;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Cannot convert frequency");
+
+        }
+
+        return frequencyInMillis;
+    }
 }

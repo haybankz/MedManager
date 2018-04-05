@@ -1,4 +1,4 @@
-package com.haybankz.medmanager;
+package com.haybankz.medmanager.adapter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

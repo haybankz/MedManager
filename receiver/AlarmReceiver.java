@@ -1,7 +1,6 @@
-package com.haybankz.medmanager;
+package com.haybankz.medmanager.receiver;
 
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -13,15 +12,17 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.model.Medication;
-import com.haybankz.medmanager.ui.MainActivity;
+import com.haybankz.medmanager.model.Reminder;
+import com.haybankz.medmanager.ui.AddMedicationActivity;
 import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.haybankz.medmanager.util.ReminderDbUtils;
 
 import java.util.Calendar;
 
@@ -42,20 +43,25 @@ public class AlarmReceiver extends BroadcastReceiver{
 
         int receiverId = Integer.parseInt(intent.getStringExtra(Constant.REMINDER_ID));
 
-        Medication medication = MedicationDbUtils.getMedicationById(context, receiverId);
+        Reminder reminder = ReminderDbUtils.getReminder(context, receiverId);
+
+        long medicationId= reminder.getMedicationId();
+
+        Medication medication = MedicationDbUtils.getMedicationById(context, medicationId);
+
         String title = medication.getName();
 
         Log.e("ALarm reciever", "onReceive: notification running........"+ medication.toString() );
 
         // creating intent to open mainactivity when notification is clicked
-        Intent addIntent = new Intent(context, MainActivity.class);
+        Intent addIntent = new Intent(context, AddMedicationActivity.class);
         addIntent.putExtra(Constant.REMINDER_ID,  String.valueOf(receiverId));
         PendingIntent mReminderPendingIntent = PendingIntent.getActivity(context, receiverId,
                 addIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(context, Constant.REMINDER_ID)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher_round))
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round))
                 .setSmallIcon(R.drawable.ic_action_calendar)
                 .setContentTitle((context.getResources().getString(R.string.app_name)))
                 .setContentText(title)
@@ -80,7 +86,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(Constant.REMINDER_ID, id);
+        intent.putExtra(Constant.REMINDER_ID, "" +id);
         mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         long diffTime =  startDateTimeInMillis - Calendar.getInstance().getTimeInMillis();

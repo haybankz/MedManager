@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.data.reminder.ReminderContract;
+import com.haybankz.medmanager.data.reminder.ReminderContract.ReminderEntry;
 import com.haybankz.medmanager.model.Medication;
 
 import java.util.ArrayList;
@@ -18,9 +20,38 @@ import java.util.List;
 
 public class MedicationDbUtils {
 
-    public static Uri saveMedication(Context context, ContentValues values){
+    public static Uri insertMedication(Context context, ContentValues values){
 
-        return context.getContentResolver().insert(MedicationEntry.CONTENT_URI, values);
+        Uri uri =  context.getContentResolver().insert(MedicationEntry.CONTENT_URI, values);
+
+        if(uri != null){
+            long medicationId = ContentUris.parseId(uri);
+            long startDateTime =  values.getAsLong(MedicationEntry.COLUMN_MEDICATION_START_DATE);
+            long endDateTime = values.getAsLong(MedicationEntry.COLUMN_MEDICATION_END_DATE);
+            int frequency = values.getAsInteger(MedicationEntry.COLUMN_MEDICATION_FREQUENCY);
+            long frequencyInMillis = DateTimeUtils.getFrequencyInMilliseconds(frequency);
+
+            ContentValues reminderValues = new ContentValues();
+            reminderValues.put(ReminderEntry.COLUMN_MEDICATION_ID, medicationId);
+
+
+
+            while(startDateTime < endDateTime ){
+                reminderValues.put(ReminderEntry.COLUMN_REMINDER_DATE_TIME, startDateTime);
+                ReminderDbUtils.insertReminder(context, reminderValues);
+
+                startDateTime += frequencyInMillis;
+            }
+
+            reminderValues.put(ReminderEntry.COLUMN_REMINDER_DATE_TIME, endDateTime);
+            ReminderDbUtils.insertReminder(context, reminderValues);
+
+
+
+
+        }
+
+        return uri;
     }
 
     public static int addBulkMedication(Context context, ContentValues[] values){
@@ -32,7 +63,8 @@ public class MedicationDbUtils {
 
        ArrayList<Medication> medications = new ArrayList<>();
 
-        String[] projection = {MedicationEntry._ID,
+        String[] projection = {
+                MedicationEntry._ID,
                 MedicationEntry.COLUMN_MEDICATION_NAME,
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
@@ -156,6 +188,24 @@ public class MedicationDbUtils {
 
         return medications;
 
+    }
+
+    public static int updateMedication(Context context, long id, ContentValues values){
+
+//        String selection = MedicationEntry._ID + "=?";
+//        String[] selectionArgs = {String.valueOf(id)};
+
+        Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
+
+        return context.getContentResolver().update(uri, values, null, null);
+
+    }
+
+    public static int deleteMedication(Context context, long id){
+
+        Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
+
+        return context.getContentResolver().delete(uri, null, null);
     }
 
 }
