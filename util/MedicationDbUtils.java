@@ -43,10 +43,6 @@ public class MedicationDbUtils {
                 startDateTime += frequencyInMillis;
             }
 
-//            if(startDateTime >= endDateTime){
-//                reminderValues.put(ReminderEntry.COLUMN_REMINDER_DATE_TIME, endDateTime);
-//                ReminderDbUtils.insertReminder(context, reminderValues);
-//            }
 
 
         }

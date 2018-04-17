@@ -53,8 +53,8 @@ public class DateTimeUtils {
                 break;
 
             default:
-//                throw new IllegalArgumentException("Cannot convert frequency");
-                frequencyInMillis = Constant.DAY_IN_MILLIS / 96;
+                throw new IllegalArgumentException("Cannot convert frequency");
+
 
         }
 

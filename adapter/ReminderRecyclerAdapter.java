@@ -52,36 +52,6 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
 
         holder.bindReminder(mContext, reminder);
 
-//        holder.mRescheduleImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AlarmReceiver alarmReceiver = new AlarmReceiver();
-//                alarmReceiver.cancelAlarm(mContext, (int)reminder.getId());
-//
-//                Toast.makeText(mContext, "Reschedule", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        holder.mTakeMedicationImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//                if(!reminder.isTaken()) {
-//                    final int i = ReminderDbUtils.ReminderTaken(mContext, reminder.getId());
-//                    holder.mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.colorPrimary));
-//                    holder.mRefuseMedicationImageView.setEnabled(true);
-//
-//                }
-//                Toast.makeText(mContext, "Take", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        holder.mRefuseMedicationImageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(mContext, "Refuse", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
 
     }
 
@@ -194,10 +164,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             switch(v.getId()){
 
                 case R.id.img_rem_reschedule:
-                    AlarmReceiver alarmReceiver = new AlarmReceiver();
-                    alarmReceiver.cancelAlarm(mContext, (int)mReminder.getId());
 
-                    Toast.makeText(mContext, "Reschedule", Toast.LENGTH_SHORT).show();
                     break;
 
                 case R.id.img_rem_refuse_medic:

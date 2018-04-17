@@ -152,33 +152,12 @@ public class AddMedicationActivity extends AppCompatActivity {
 
     public void addMedication(){
 
-//        if(mStartDatePickerDialog != null && mEndDatePickerDialog != null) {
 
-//            DatePicker startDatePicker = mStartDatePickerDialog.getDatePicker();
-//            DatePicker endDatePicker = mEndDatePickerDialog.getDatePicker();
-//
-//            int sYear = startDatePicker.getYear(), sMonth = startDatePicker.getMonth(),
-//                    sDay = startDatePicker.getDayOfMonth(), sHour = 0, sMinute = 0;
-//
-//            int eYear = endDatePicker.getYear(), eMonth = endDatePicker.getMonth(),
-//                    eDay = endDatePicker.getDayOfMonth(), eHour = 0, eMinute = 0;
-//
-//            if (mStartTimePicker != null) {
-//                sHour = mStartTimePicker.getCurrentHour();
-//                sMinute = mStartTimePicker.getCurrentMinute();
-//            }
-//
-//            if (mEndTimePicker != null) {
-//                eHour = mEndTimePicker.getCurrentHour();
-//                eMinute = mEndTimePicker.getCurrentMinute();
-//            }
 
             String name = mNameEditText.getText().toString().trim();
             String description = mDescriptionEditText.getText().toString().trim();
             int frequency = mFrequencySpinner.getSelectedItemPosition() + 1;
 
-//            long startDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(sYear, sMonth, sDay, sHour, sMinute);
-//            long endDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(eYear, eMonth, eDay, eHour, eMinute);
 
             ContentValues contentValues = new ContentValues();
 
@@ -195,23 +174,12 @@ public class AddMedicationActivity extends AppCompatActivity {
                 Uri medicationUri = MedicationDbUtils.insertMedication(mContext, contentValues);
                 Log.e(TAG, "addMedication: " + contentValues.toString());
 
-                if (medicationUri != null) {
-                    Toast.makeText(mContext, "Medication created :" + medicationUri.getPath(), Toast.LENGTH_SHORT).show();
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.DAY_IN_MILLIS / frequency );
-
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
-
-                }
+               
 
             } else {
                 Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
             }
-//        }else{
-//            Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
-//
-//        }
+
 
     }
 

@@ -138,35 +138,6 @@ public class FileUtils {
         }
     }
 
-    public static void addPicToGallery(Context context, String filePath){
-
-        MediaScannerConnection.scanFile(context, new String[]{filePath}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            @Override
-            public void onScanCompleted(String path, Uri uri) {
-
-            }
-        });
-
-    }
-
-    public static Intent shareFile(String absoluteFilePath) {
-
-
-
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        Uri fileUri = Uri.parse(absoluteFilePath);
-
-        File file = new File(fileUri.getPath());
-
-        Log.e(TAG, "shareFile: " + file.getPath());
-
-        shareIntent.setData(fileUri);
-        shareIntent.setType("image/png");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-
-
-        return shareIntent;
-    }
 
 
 

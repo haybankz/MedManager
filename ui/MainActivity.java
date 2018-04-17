@@ -99,17 +99,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(getIntent() != null){
             Bundle bundle = getIntent().getExtras();
             if(bundle != null) {
-//                mNameTextView.setText(String.valueOf(bundle.get(Constant.KEY_ACCT_DISPLAY_NAME)));
-//                mEmailTextView.setText(String.valueOf(bundle.get(Constant.KEY_ACCT_EMAIL)));
-//
-//                Picasso.with(this)
-//                        .load(String.valueOf(bundle.get(Constant.KEY_ACCT_PHOTO_URL)))
-//                        .transform(new PicassoCircleTransformation())
-//                        .placeholder(R.drawable.ic_menu_send)
-//                        .error(R.drawable.ic_menu_camera)
-//                        .networkPolicy(NetworkPolicy.OFFLINE)
-//                        .noFade()
-//                        .into(mProfilePicImageView);
 
                 int i = getIntent().getIntExtra(Constant.KEY_ACCT_ID, 0);
                 String photoUrl = getIntent().getStringExtra(Constant.KEY_ACCT_PHOTO_URL);
@@ -190,8 +179,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SimpleFragmentPagerAdapter simpleFragmentPagerAdapter =
                 new SimpleFragmentPagerAdapter(this, getSupportFragmentManager());
 
-        viewPager.setAdapter(simpleFragmentPagerAdapter);
 
+        viewPager.setAdapter(simpleFragmentPagerAdapter);
+        viewPager.setCurrentItem(0);
 
         tabLayout = findViewById(R.id.sliding_tabs);
 
@@ -379,10 +369,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             Intent intent = new Intent(this, UpdateUserActivity.class);
             startActivity(intent);
-
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
 
         }
 

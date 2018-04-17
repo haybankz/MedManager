@@ -40,10 +40,10 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
 
         switch(position){
             case 0:
-                return "Reminders";
+                return "Medications";
 
             case 1:
-                return "Medications";
+                return "Reminders";
 
             default:
                 return null;
