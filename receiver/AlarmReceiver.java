@@ -5,20 +5,25 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.haybankz.medmanager.R;
+import com.haybankz.medmanager.data.medication.MedicationContract;
+import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.model.Reminder;
 import com.haybankz.medmanager.ui.AddMedicationActivity;
+import com.haybankz.medmanager.ui.ViewMedicationActivity;
 import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
@@ -54,15 +59,17 @@ public class AlarmReceiver extends BroadcastReceiver{
         Log.e("ALarm reciever", "onReceive: notification running........"+ medication.toString() );
 
         // creating intent to open mainactivity when notification is clicked
-        Intent addIntent = new Intent(context, AddMedicationActivity.class);
-        addIntent.putExtra(Constant.REMINDER_ID,  String.valueOf(receiverId));
+        Intent addIntent = new Intent(context, ViewMedicationActivity.class);
+//        addIntent.putExtra(Constant.REMINDER_ID,  String.valueOf(receiverId));
+        Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, medicationId);
+        addIntent.setData(uri);
         PendingIntent mReminderPendingIntent = PendingIntent.getActivity(context, receiverId,
                 addIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(context, Constant.REMINDER_ID)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round))
-                .setSmallIcon(R.drawable.ic_action_calendar)
+                .setSmallIcon(R.drawable.ic_reschedule)
                 .setContentTitle((context.getResources().getString(R.string.app_name)))
                 .setContentText(title)
                 .setTicker(title)
@@ -89,9 +96,9 @@ public class AlarmReceiver extends BroadcastReceiver{
         intent.putExtra(Constant.REMINDER_ID, "" +id);
         mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        long diffTime =  startDateTimeInMillis - Calendar.getInstance().getTimeInMillis();
+//        long diffTime =  startDateTimeInMillis - Calendar.getInstance().getTimeInMillis();
 
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + diffTime, mPendingIntent);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, startDateTimeInMillis, mPendingIntent);
 
 
         ComponentName receiver = new ComponentName(context, BootReceiver.class);

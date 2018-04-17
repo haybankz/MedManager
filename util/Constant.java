@@ -33,6 +33,15 @@ public class Constant {
     public static final String TEXT_FOUR_TIMES_A_DAY = "reminds four times a day";
 
 
+    public static final String KEY_ACCT_DISPLAY_NAME = "display_name";
+    public static final String KEY_ACCT_GIVEN_NAME = "given_name";
+    public static final String KEY_ACCT_FAMILY_NAME = "family_name";
+    public static final String KEY_ACCT_PHOTO_URL = "photo_url";
+    public static final String KEY_ACCT_EMAIL = "email";
+    public static final String KEY_ACCT_ID = "id";
+    public static final String KEY_ACCT_PROFILE_ID = "profile_id";
+
+
 
 
 }

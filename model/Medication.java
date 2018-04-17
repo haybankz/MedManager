@@ -11,6 +11,7 @@ public class Medication {
     private long mId;
     private String mName;
     private String mDescription;
+    private String mDosage;
     private int mFrequency;
     private long mStartDateTime;
     private long mEndDateTime;
@@ -19,19 +20,21 @@ public class Medication {
     public Medication() {
     }
 
-    public Medication(String mName, String mDescription, int mFrequency, long mStartDateTime, long mEndDateTime) {
+    public Medication(String mName, String mDescription, String mDosage, int mFrequency, long mStartDateTime, long mEndDateTime) {
         this.mName = mName;
         this.mDescription = mDescription;
+        this.mDosage = mDosage;
         this.mFrequency = mFrequency;
         this.mStartDateTime = mStartDateTime;
         this.mEndDateTime = mEndDateTime;
     }
 
-    public Medication(long mId, String mName, String mDescription, int mFrequency, long mStartDateTime,
+    public Medication(long mId, String mName, String mDescription, String mDosage, int mFrequency, long mStartDateTime,
                       long mEndDateTime, boolean mActive) {
         this.mId = mId;
         this.mName = mName;
         this.mDescription = mDescription;
+        this.mDosage = mDosage;
         this.mFrequency = mFrequency;
         this.mStartDateTime = mStartDateTime;
         this.mEndDateTime = mEndDateTime;
@@ -90,6 +93,11 @@ public class Medication {
 //        this.mActive = mActive;
 //    }
 
+    public String getDosage() {
+        return mDosage;
+    }
+
+
     public boolean isActive(){
         return mActive;
     }
@@ -98,6 +106,7 @@ public class Medication {
         return "Medication = id: " +mId +
                 "\n name: "+ mName +
                 "\n description: " +mDescription +
+                "\n dosage: " + mDosage +
                 "\n frequency: " + mFrequency +
                 "\n startdate: " + DateTimeUtils.getDateTimeString(mStartDateTime) +
                 "\n enddate: " + DateTimeUtils.getDateTimeString(mEndDateTime) +

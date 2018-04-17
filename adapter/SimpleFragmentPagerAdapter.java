@@ -21,7 +21,7 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if(position == 0){
+        if(position == 1){
             return new ReminderListFragment();
         }else{
             return new MedicationListFragment();
@@ -40,10 +40,10 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
 
         switch(position){
             case 0:
-                return mContext.getString(R.string.app_name);
+                return "Reminders";
 
             case 1:
-                return mContext.getString(R.string.title_home);
+                return "Medications";
 
             default:
                 return null;

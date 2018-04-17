@@ -1,6 +1,7 @@
 package com.haybankz.medmanager.adapter;
 
 import android.content.Context;
+import android.graphics.ColorFilter;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +15,10 @@ import android.widget.Toast;
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.model.Reminder;
+import com.haybankz.medmanager.receiver.AlarmReceiver;
 import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.haybankz.medmanager.util.ReminderDbUtils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -43,11 +46,41 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReminderViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ReminderViewHolder holder, int position) {
 
-        Reminder reminder = mReminders.get(position);
+        final Reminder reminder = mReminders.get(position);
 
         holder.bindReminder(mContext, reminder);
+
+//        holder.mRescheduleImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlarmReceiver alarmReceiver = new AlarmReceiver();
+//                alarmReceiver.cancelAlarm(mContext, (int)reminder.getId());
+//
+//                Toast.makeText(mContext, "Reschedule", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        holder.mTakeMedicationImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                if(!reminder.isTaken()) {
+//                    final int i = ReminderDbUtils.ReminderTaken(mContext, reminder.getId());
+//                    holder.mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.colorPrimary));
+//                    holder.mRefuseMedicationImageView.setEnabled(true);
+//
+//                }
+//                Toast.makeText(mContext, "Take", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        holder.mRefuseMedicationImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(mContext, "Refuse", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
 
     }
@@ -69,7 +102,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
     public void addAll(ArrayList<Reminder> reminders){
         mReminders.clear();
         mReminders.addAll(reminders);
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
 
@@ -93,6 +126,7 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
         ImageView mRemImageView;
 
         Context mContext;
+        Reminder  mReminder;
 
 
 
@@ -114,39 +148,22 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             mRefuseMedicationImageView.setOnClickListener(this);
             mRescheduleImageView.setOnClickListener(this);
             mTakeMedicationImageView.setOnClickListener(this);
+            itemView.setOnClickListener(this);
 
         }
 
 
         private void bindReminder(Context context, @NonNull Reminder reminder) {
 
+
+
             Medication medication = MedicationDbUtils.getMedicationById(context, reminder.getMedicationId());
 
-            mMedicationNameTextView.setText(medication.getName());
-            mDosageTextView.setText("Pick two");
-            mReminderTimeTextView.setText(DateTimeUtils.getDateTimeString(reminder.getReminderDateTime()));
+            mReminder = reminder;
 
-//            String interval = "";
-//            switch (medication.getFrequency()){
-//                case Constant.INT_ONCE_A_DAY:
-//                    interval = Constant.TEXT_ONCE_A_DAY;
-//                    break;
-//
-//                case Constant.INT_TWICE_A_DAY:
-//                    interval = Constant.TEXT_TWICE_A_DAY;
-//                    break;
-//
-//                case Constant.INT_THRICE_A_DAY:
-//                    interval = Constant.TEXT_THRICE_A_DAY;
-//                    break;
-//
-//                case Constant.INT_FOUR_TIMES_A_DAY:
-//                    interval = Constant.TEXT_FOUR_TIMES_A_DAY;
-//                    break;
-//
-//                default:
-//                    break;
-//            }
+            mMedicationNameTextView.setText(medication.getName());
+            mDosageTextView.setText(medication.getDosage());
+            mReminderTimeTextView.setText(DateTimeUtils.getDateTimeString(reminder.getReminderDateTime()));
 
 
             Picasso.with(context)
@@ -157,13 +174,18 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
                     .noFade()
                     .into(mRemImageView);
 
-
             if(reminder.isTaken()) {
-                mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
-//                mTakeMedicationImageView.setEnabled(false);
+                mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(context, R.color.darker_gray));
+                mTakeMedicationImageView.setEnabled(false);
             }else{
-//                mRefuseMedicationImageView.setEnabled(false);
+                mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
+                mRefuseMedicationImageView.setColorFilter(ContextCompat.getColor(context, R.color.darker_gray));
+                mRefuseMedicationImageView.setEnabled(true);
             }
+
+            mRescheduleImageView.setColorFilter(ContextCompat.getColor(context, R.color.darker_gray));
+
+
 
         }
 
@@ -172,15 +194,34 @@ public class ReminderRecyclerAdapter extends RecyclerView.Adapter<ReminderRecycl
             switch(v.getId()){
 
                 case R.id.img_rem_reschedule:
-                    Toast.makeText(mContext, "Reschedule clicked", Toast.LENGTH_SHORT).show();
+                    AlarmReceiver alarmReceiver = new AlarmReceiver();
+                    alarmReceiver.cancelAlarm(mContext, (int)mReminder.getId());
+
+                    Toast.makeText(mContext, "Reschedule", Toast.LENGTH_SHORT).show();
                     break;
 
                 case R.id.img_rem_refuse_medic:
+                    ReminderDbUtils.ReminderRefuse(mContext, mReminder.getId());
+                    mRefuseMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.colorPrimary));
+                    mTakeMedicationImageView.setEnabled(true);
+                    mRefuseMedicationImageView.setEnabled(false);
+                    mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.darker_gray));
                     Toast.makeText(mContext, "Refuse clicked", Toast.LENGTH_SHORT).show();
                     break;
 
+
                 case R.id.img_rem_take_med:
-                    Toast.makeText(mContext, "take clicked", Toast.LENGTH_SHORT).show();
+                    if(!mReminder.isTaken()) {
+                        ReminderDbUtils.ReminderTaken(mContext, mReminder.getId());
+                        mTakeMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.colorPrimary));
+                        mTakeMedicationImageView.setEnabled(false);
+                        mRefuseMedicationImageView.setEnabled(true);
+                        mRefuseMedicationImageView.setColorFilter(ContextCompat.getColor(mContext, R.color.darker_gray));
+                        Toast.makeText(mContext, "Take", Toast.LENGTH_SHORT).show();
+
+                    }
+
+
                     break;
 
                 default:

@@ -43,10 +43,10 @@ public class MedicationDbUtils {
                 startDateTime += frequencyInMillis;
             }
 
-            reminderValues.put(ReminderEntry.COLUMN_REMINDER_DATE_TIME, endDateTime);
-            ReminderDbUtils.insertReminder(context, reminderValues);
-
-
+//            if(startDateTime >= endDateTime){
+//                reminderValues.put(ReminderEntry.COLUMN_REMINDER_DATE_TIME, endDateTime);
+//                ReminderDbUtils.insertReminder(context, reminderValues);
+//            }
 
 
         }
@@ -67,6 +67,8 @@ public class MedicationDbUtils {
                 MedicationEntry._ID,
                 MedicationEntry.COLUMN_MEDICATION_NAME,
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
+                MedicationEntry.COLUMN_MEDICATION_DOSAGE,
+
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
                 MedicationEntry.COLUMN_MEDICATION_END_DATE,
@@ -86,12 +88,13 @@ public class MedicationDbUtils {
                 long id = c.getLong(c.getColumnIndexOrThrow(MedicationEntry._ID));
                 String name = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_NAME));
                 String description = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION));
+                String dosage = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DOSAGE));
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
                 boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1;
 
-                Medication medication = new Medication(id, name, description, frequency, startDate, endDate, active);
+                Medication medication = new Medication(id, name, description, dosage, frequency, startDate, endDate, active);
 
                 medications.add(medication);
             }
@@ -112,6 +115,8 @@ public class MedicationDbUtils {
         String[] projection = {MedicationEntry._ID,
                 MedicationEntry.COLUMN_MEDICATION_NAME,
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
+                MedicationEntry.COLUMN_MEDICATION_DOSAGE,
+
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
                 MedicationEntry.COLUMN_MEDICATION_END_DATE,
@@ -126,12 +131,13 @@ public class MedicationDbUtils {
                 long id = c.getLong(c.getColumnIndexOrThrow(MedicationEntry._ID));
                 String name = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_NAME));
                 String description = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION));
+                String dosage = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DOSAGE));
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
                 boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1;
 
-                medication = new Medication(id, name, description, frequency, startDate, endDate, active);
+                medication = new Medication(id, name, description, dosage, frequency, startDate, endDate, active);
 
 
             }
@@ -150,6 +156,7 @@ public class MedicationDbUtils {
         String[] projection = {MedicationEntry._ID,
                 MedicationEntry.COLUMN_MEDICATION_NAME,
                 MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
+                MedicationEntry.COLUMN_MEDICATION_DOSAGE,
                 MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
                 MedicationEntry.COLUMN_MEDICATION_START_DATE,
                 MedicationEntry.COLUMN_MEDICATION_END_DATE,
@@ -166,13 +173,14 @@ public class MedicationDbUtils {
                 long id = c.getLong(c.getColumnIndexOrThrow(MedicationEntry._ID));
                 String name = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_NAME));
                 String description = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION));
+                String dosage = c.getString(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_DOSAGE));
                 int frequency = c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_FREQUENCY));
                 long startDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_START_DATE));
                 long endDate = c.getLong(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_END_DATE));
                 boolean active =  c.getInt(c.getColumnIndexOrThrow(MedicationEntry.COLUMN_MEDICATION_ACTIVE)) == 1 ;
 
 
-                Medication medication = new Medication(id, name, description, frequency, startDate, endDate, active);
+                Medication medication = new Medication(id, name, description, dosage, frequency, startDate, endDate, active);
 
                 medications.add(medication);
             }
@@ -201,11 +209,36 @@ public class MedicationDbUtils {
 
     }
 
+    public static int deactivateMedication(Context context, long id){
+        ContentValues values = new ContentValues();
+        values.put(MedicationEntry.COLUMN_MEDICATION_ACTIVE, 0);
+
+        Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
+
+        return context.getContentResolver().update(uri, values, null, null);
+    }
+
+    public static int activateMedication(Context context, long id){
+        ContentValues values = new ContentValues();
+        values.put(MedicationEntry.COLUMN_MEDICATION_ACTIVE, 1);
+
+        Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
+
+        return context.getContentResolver().update(uri, values, null, null);
+    }
+
     public static int deleteMedication(Context context, long id){
 
         Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
 
-        return context.getContentResolver().delete(uri, null, null);
+
+        int deleted =  context.getContentResolver().delete(uri, null, null);
+
+        if(deleted > 0){
+            ReminderDbUtils.deleteRemindersOfMedication(context, id);
+        }
+
+        return deleted;
     }
 
 }

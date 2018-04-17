@@ -1,18 +1,15 @@
 package com.haybankz.medmanager.ui;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,12 +31,20 @@ import com.haybankz.medmanager.adapter.MedicationRecyclerAdapter;
 import com.haybankz.medmanager.adapter.PicassoCircleTransformation;
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.adapter.SimpleFragmentPagerAdapter;
+import com.haybankz.medmanager.data.user.UserContract;
 import com.haybankz.medmanager.listener.ClickListener;
 import com.haybankz.medmanager.listener.RecyclerTouchListener;
 import com.haybankz.medmanager.model.Medication;
+import com.haybankz.medmanager.model.User;
+import com.haybankz.medmanager.util.Constant;
+import com.haybankz.medmanager.util.FileUtils;
+import com.haybankz.medmanager.util.ImageUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.haybankz.medmanager.util.PreferenceUtils;
+import com.haybankz.medmanager.util.UserDbUtils;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -61,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView mProfilePicImageView;
 
     GoogleSignInClient mGoogleSignInClient;
+
+    private User user;
 
 
     @Override
@@ -92,17 +99,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(getIntent() != null){
             Bundle bundle = getIntent().getExtras();
             if(bundle != null) {
-                mNameTextView.setText(String.valueOf(bundle.get("display_name")));
-                mEmailTextView.setText(String.valueOf(bundle.get("email")));
+//                mNameTextView.setText(String.valueOf(bundle.get(Constant.KEY_ACCT_DISPLAY_NAME)));
+//                mEmailTextView.setText(String.valueOf(bundle.get(Constant.KEY_ACCT_EMAIL)));
+//
+//                Picasso.with(this)
+//                        .load(String.valueOf(bundle.get(Constant.KEY_ACCT_PHOTO_URL)))
+//                        .transform(new PicassoCircleTransformation())
+//                        .placeholder(R.drawable.ic_menu_send)
+//                        .error(R.drawable.ic_menu_camera)
+//                        .networkPolicy(NetworkPolicy.OFFLINE)
+//                        .noFade()
+//                        .into(mProfilePicImageView);
 
-                Picasso.with(this)
-                        .load(String.valueOf(bundle.get("photo_url")))
-                        .transform(new PicassoCircleTransformation())
-                        .placeholder(R.drawable.ic_menu_send)
-                        .error(R.drawable.ic_menu_camera)
-                        .noFade()
-                        .into(mProfilePicImageView);
+                int i = getIntent().getIntExtra(Constant.KEY_ACCT_ID, 0);
+                String photoUrl = getIntent().getStringExtra(Constant.KEY_ACCT_PHOTO_URL);
 
+                if(i > 0){
+                    user = UserDbUtils.getUserById(this, i);
+                    if(user != null){
+                        mNameTextView.setText(user.getDisplayName());
+                        mEmailTextView.setText(user.getEmail());
+
+                        if(user.getPhotoUrl() != null && !user.getPhotoUrl().equals("")) {
+                            Picasso.with(this)
+                                    .load(user.getPhotoUrl())
+                                    .transform(new PicassoCircleTransformation())
+                                    .fit()
+                                    .placeholder(R.drawable.ic_person_white)
+                                    .error(R.drawable.ic_person_dark)
+//                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                                    .noFade()
+                                    .into(mProfilePicImageView);
+                        }else{
+                            mProfilePicImageView.setImageResource(R.drawable.ic_person_white);
+                        }
+                    }
+                }
+
+                if(photoUrl != null && !photoUrl.equals("") && i > 0){
+                    Picasso.with(this)
+                        .load(photoUrl)
+                        .into(ImageUtils.getTarget(this, i));
+
+                    File file = FileUtils.saveImage(this, ImageUtils.getBitmapFromPath(this, photoUrl));
+                    ContentValues values = new ContentValues();
+                    values.put(UserContract.UserEntry.COLUMN_USER_PHOTO_URL, "file:" + file.getPath());
+
+                    UserDbUtils.updateUser(this, i, values);
+                }
+
+            }else{
+                int i = getIntent().getIntExtra(Constant.KEY_ACCT_ID, 0);
+
+                if(i > 0){
+                    user = UserDbUtils.getUserById(this, i);
+                    if(user != null){
+                        mNameTextView.setText(user.getDisplayName());
+                        mEmailTextView.setText(user.getEmail());
+
+                        Picasso.with(this)
+                                .load(user.getPhotoUrl())
+                                .transform(new PicassoCircleTransformation())
+                                .placeholder(R.drawable.ic_person_white)
+                                .error(R.drawable.ic_person_dark)
+//                                .networkPolicy(NetworkPolicy.OFFLINE)
+                                .noFade()
+                                .into(mProfilePicImageView);
+                    }
+                }
             }
 
         }
@@ -185,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         searchViewItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchViewItem.getActionView();
-        ImageView v =  searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
+//        ImageView v =  searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
         final TextView searchTextView = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchTextView.setBackgroundColor(getResources().getColor(R.color.white));
         searchTextView.setTextColor(getResources().getColor(R.color.black));
@@ -269,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -301,18 +366,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Handle the camera action
         } else if (id == R.id.nav_search) {
 
-
             searchViewItem.expandActionView();
 
         } else if (id == R.id.nav_log_out) {
 
             mGoogleSignInClient.signOut();
+            PreferenceUtils.setLoggedOut(this);
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_update_user) {
 
-        } else if (id == R.id.nav_share) {
+            Intent intent = new Intent(this, UpdateUserActivity.class);
+            startActivity(intent);
 
-        } else if (id == R.id.nav_send) {
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
 
         }
 
@@ -321,4 +391,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int id = (int) PreferenceUtils.getLoggedInUser(this);
+
+        user = UserDbUtils.getUserById(this, id);
+        if(user != null){
+            mNameTextView.setText(user.getDisplayName());
+            mEmailTextView.setText(user.getEmail());
+
+            if(user.getPhotoUrl() != null && !user.getPhotoUrl().equals("")) {
+                Picasso.with(this)
+                        .load(user.getPhotoUrl())
+                        .transform(new PicassoCircleTransformation())
+                        .fit()
+                        .placeholder(R.drawable.ic_person_white)
+                        .error(R.drawable.ic_person_dark)
+//                                    .networkPolicy(NetworkPolicy.OFFLINE)
+                        .noFade()
+                        .into(mProfilePicImageView);
+            }else{
+                mProfilePicImageView.setImageResource(R.drawable.ic_person_white);
+            }
+        }
+    }
 }

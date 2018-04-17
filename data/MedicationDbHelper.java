@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
-import com.haybankz.medmanager.data.reminder.ReminderContract;
+import com.haybankz.medmanager.data.user.UserContract.UserEntry;
 import com.haybankz.medmanager.data.reminder.ReminderContract.ReminderEntry;
 
 /**
@@ -26,6 +26,7 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
             MedicationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             MedicationEntry.COLUMN_MEDICATION_NAME + TEXT_TYPE + " NOT NULL"+ COMMA_SEP +
             MedicationEntry.COLUMN_MEDICATION_DESCRIPTION + TEXT_TYPE + " NOT NULL"+ COMMA_SEP +
+            MedicationEntry.COLUMN_MEDICATION_DOSAGE + TEXT_TYPE + " NOT NULL"+ COMMA_SEP +
             MedicationEntry.COLUMN_MEDICATION_FREQUENCY + " INTEGER" + COMMA_SEP +
             MedicationEntry.COLUMN_MEDICATION_START_DATE + " INTEGER"  + COMMA_SEP +
             MedicationEntry.COLUMN_MEDICATION_END_DATE + " INTEGER" + COMMA_SEP +
@@ -42,9 +43,22 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
 
             " )";
 
+    private static final String SQL_CREATE_USER_ENTRIES = "CREATE TABLE "+ UserEntry.TABLE_NAME +" ( " +
+            UserEntry.COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+            UserEntry.COLUMN_USER_PROFILE_ID + TEXT_TYPE  + COMMA_SEP +
+            UserEntry.COLUMN_USER_GIVEN_NAME + TEXT_TYPE  + COMMA_SEP +
+            UserEntry.COLUMN_USER_FAMILY_NAME + TEXT_TYPE + COMMA_SEP +
+            UserEntry.COLUMN_USER_DISPLAY_NAME +TEXT_TYPE + COMMA_SEP +
+            UserEntry.COLUMN_USER_EMAIL + TEXT_TYPE + COMMA_SEP +
+            UserEntry.COLUMN_USER_PASSWORD + TEXT_TYPE + COMMA_SEP +
+            UserEntry.COLUMN_USER_PHOTO_URL + TEXT_TYPE +
+
+            " )";
+
 
     private static final String SQL_DELETE_MEDICATION_ENTRIES = "DROP TABLE IF EXISTS "+ MedicationEntry.TABLE_NAME;
     private static final String SQL_DELETE_REMINDER_ENTRIES = "DROP TABLE IF EXISTS "+ ReminderEntry.TABLE_NAME;
+    private static final String SQL_DELETE_USER_ENTRIES = "DROP TABLE IF EXISTS "+ UserEntry.TABLE_NAME;
 
 
     public MedicationDbHelper(Context context) {
@@ -60,6 +74,7 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_MEDICATION_ENTRIES);
         db.execSQL(SQL_CREATE_REMINDER_ENTRIES);
+        db.execSQL(SQL_CREATE_USER_ENTRIES);
 
     }
 
@@ -67,6 +82,7 @@ public class MedicationDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_MEDICATION_ENTRIES);
         db.execSQL(SQL_DELETE_REMINDER_ENTRIES);
+        db.execSQL(SQL_DELETE_USER_ENTRIES);
 
         onCreate(db);
     }

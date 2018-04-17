@@ -1,5 +1,9 @@
 package com.haybankz.medmanager.util;
 
+import android.util.Log;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +14,8 @@ import java.util.Locale;
  */
 
 public class DateTimeUtils {
+
+
 
     public static long getDateTimeInMilliseconds(int year, int month, int day, int hourOfDay, int minute){
         Calendar calendar = Calendar.getInstance();
@@ -47,10 +53,25 @@ public class DateTimeUtils {
                 break;
 
             default:
-                throw new IllegalArgumentException("Cannot convert frequency");
+//                throw new IllegalArgumentException("Cannot convert frequency");
+                frequencyInMillis = Constant.DAY_IN_MILLIS / 96;
 
         }
 
         return frequencyInMillis;
+    }
+
+    public static long DateTimeStringToMillis(String dateTime){
+        DateFormat format = new SimpleDateFormat("dd MMM, yyyy hh:mm a", Locale.US);
+        long timeInMillis = 0;
+        try{
+            Date date = format.parse(dateTime);
+            timeInMillis = date.getTime();
+
+        }catch (ParseException e){
+            Log.e("DateTimeUtils", "DateTimeStringToMillis: ", e);
+        }
+
+        return timeInMillis;
     }
 }

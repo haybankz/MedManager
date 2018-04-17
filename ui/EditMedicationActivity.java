@@ -2,16 +2,18 @@ package com.haybankz.medmanager.ui;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -22,18 +24,17 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-
 import com.haybankz.medmanager.R;
+import com.haybankz.medmanager.data.medication.MedicationContract;
 import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
 
 import java.util.Calendar;
-import java.util.List;
 
 
-public class AddMedicationActivity extends AppCompatActivity {
+public class EditMedicationActivity extends AppCompatActivity {
 
     private String TAG = getClass().getName();
     EditText mNameEditText;
@@ -46,9 +47,6 @@ public class AddMedicationActivity extends AppCompatActivity {
 
     FloatingActionButton mStartDateFab;
     FloatingActionButton mEndDateFab;
-
-    FloatingActionButton saveFab;
-
 
 
     private Context mContext = this;
@@ -63,16 +61,19 @@ public class AddMedicationActivity extends AppCompatActivity {
 
     private DatePickerDialog mEndDatePickerDialog;
     private TimePickerDialog mEndTimePickerDialog;
-//    private TimePicker mStartTimePicker;
-//    private TimePicker mEndTimePicker;
 
     private long mStartDateTimeInMillis = 0l;
     private long mEndDateTimeInMillis = 0l;
+
+    private long id;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_medication);
+
+
 
         mNameEditText = findViewById(R.id.et_med_name);
         mDescriptionEditText =  findViewById(R.id.et_med_descr);
@@ -85,7 +86,8 @@ public class AddMedicationActivity extends AppCompatActivity {
         mStartDateFab =  findViewById(R.id.fabtn_start_date);
         mEndDateFab =  findViewById(R.id.fabtn_end_date);
 
-        saveFab = findViewById(R.id.fbtn_save);
+        FloatingActionButton fab = findViewById(R.id.fbtn_save);
+        fab.setVisibility(View.GONE);
 
 
         // to hide keyboard at the start  of activity, keyboard shows up cos first view in the activity is an editText
@@ -97,18 +99,8 @@ public class AddMedicationActivity extends AppCompatActivity {
         mFrequencySpinner.setAdapter(aAdpt);
 
 
-        mCalendar = Calendar.getInstance();
-        Long dateInMillis = mCalendar.getTimeInMillis();
 
-        mStartDateTextView.setText(DateTimeUtils.getDateTimeString(dateInMillis));
 
-        List<Medication> meds = MedicationDbUtils.getAllMedications(mContext);
-
-        if(meds != null) {
-            for (Medication m : meds) {
-                Log.e(TAG, "onCreate: " + m.toString());
-            }
-    }
 
         mStartDateFab.setOnClickListener(new View.OnClickListener() {
 
@@ -135,96 +127,69 @@ public class AddMedicationActivity extends AppCompatActivity {
         });
 
 
+        Intent intent = getIntent();
+        Medication medication = null;
+        if(intent != null){
+            Uri uri = intent.getData();
+            id = ContentUris.parseId(uri);
+            medication = MedicationDbUtils.getMedicationById(this, id);
+        }
+
+        if(medication != null){
+            mNameEditText.setText(medication.getName());
+            mDescriptionEditText.setText(medication.getDescription());
+            mFrequencySpinner.setSelection(medication.getFrequency() - 1);
+            mStartDateTextView.setText(DateTimeUtils.getDateTimeString(medication.getStartDateTime()));
+            mEndDateTextView.setText(DateTimeUtils.getDateTimeString(medication.getEndDateTime()));
+
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(medication.getStartDateTime());
+//            mStartDatePickerDialog.updateDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH) );
+//            mStartTimePickerDialog.updateTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+
+            c.setTimeInMillis(medication.getEndDateTime());
+//            mEndDatePickerDialog.updateDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH) );
+//            mEndTimePickerDialog.updateTime(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
 
 
-        saveFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                addMedication();
-            }
-        });
-
-
+        }
 
     }
 
 
-    public void addMedication(){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-//        if(mStartDatePickerDialog != null && mEndDatePickerDialog != null) {
+        getMenuInflater().inflate(R.menu.menu_edit_medication, menu);
 
-//            DatePicker startDatePicker = mStartDatePickerDialog.getDatePicker();
-//            DatePicker endDatePicker = mEndDatePickerDialog.getDatePicker();
-//
-//            int sYear = startDatePicker.getYear(), sMonth = startDatePicker.getMonth(),
-//                    sDay = startDatePicker.getDayOfMonth(), sHour = 0, sMinute = 0;
-//
-//            int eYear = endDatePicker.getYear(), eMonth = endDatePicker.getMonth(),
-//                    eDay = endDatePicker.getDayOfMonth(), eHour = 0, eMinute = 0;
-//
-//            if (mStartTimePicker != null) {
-//                sHour = mStartTimePicker.getCurrentHour();
-//                sMinute = mStartTimePicker.getCurrentMinute();
-//            }
-//
-//            if (mEndTimePicker != null) {
-//                eHour = mEndTimePicker.getCurrentHour();
-//                eMinute = mEndTimePicker.getCurrentMinute();
-//            }
+        return super.onCreateOptionsMenu(menu);
+    }
 
-            String name = mNameEditText.getText().toString().trim();
-            String description = mDescriptionEditText.getText().toString().trim();
-            int frequency = mFrequencySpinner.getSelectedItemPosition() + 1;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-//            long startDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(sYear, sMonth, sDay, sHour, sMinute);
-//            long endDateTimeInMillis = DateTimeUtils.getDateTimeInMilliseconds(eYear, eMonth, eDay, eHour, eMinute);
+        switch(item.getItemId()){
+            case R.id.action_save:
 
-            ContentValues contentValues = new ContentValues();
-
-            if (!(TextUtils.isEmpty(name) || TextUtils.isEmpty(description) || mStartDateTimeInMillis == 0L || mEndDateTimeInMillis == 0L )) {
-
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DOSAGE, "Take 100");
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, frequency);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, mStartDateTimeInMillis);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, mEndDateTimeInMillis);
+                updateMedication();
 
 
-                Uri medicationUri = MedicationDbUtils.insertMedication(mContext, contentValues);
-                Log.e(TAG, "addMedication: " + contentValues.toString());
+                break;
+        }
 
-                if (medicationUri != null) {
-                    Toast.makeText(mContext, "Medication created :" + medicationUri.getPath(), Toast.LENGTH_SHORT).show();
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.DAY_IN_MILLIS / frequency );
-
-//                    new AlarmReceiver().setRepeatAlarm(mContext, mStartDateTimeInMillis,
-//                            Integer.parseInt(String.valueOf(ContentUris.parseId(medicationUri))), Constant.HOUR_IN_MILLIS / 6 );
-
-                }
-
-            } else {
-                Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
-            }
-//        }else{
-//            Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();
-//
-//        }
-
+        return super.onOptionsItemSelected(item);
     }
 
     public void setUpStartDateAndTimePickerDialog(){
 
         final int cYear, cMonth, cDay;
-        Log.d(TAG, "onClick: stardate fab clicked!!!!!");
+        Log.d(TAG, "onClick: start date fab clicked!!!!!");
         final Calendar c = Calendar.getInstance();
         cYear = c.get(Calendar.YEAR);
         cMonth = c.get(Calendar.MONTH);
         cDay = c.get(Calendar.DAY_OF_MONTH);
 
-        mStartDatePickerDialog = new DatePickerDialog(mContext,new OnDateSetListener() {
+        mStartDatePickerDialog = new DatePickerDialog(mContext,new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
 
@@ -265,7 +230,7 @@ public class AddMedicationActivity extends AppCompatActivity {
         cMonth = c.get(Calendar.MONTH);
         cDay = c.get(Calendar.DAY_OF_MONTH);
 
-        mEndDatePickerDialog = new DatePickerDialog(mContext,new OnDateSetListener() {
+        mEndDatePickerDialog = new DatePickerDialog(mContext,new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
 
@@ -297,10 +262,35 @@ public class AddMedicationActivity extends AppCompatActivity {
 
     }
 
+    private void updateMedication(){
+        String name = mNameEditText.getText().toString();
+        String description = mDescriptionEditText.getText().toString();
+        int frequency = mFrequencySpinner.getSelectedItemPosition() + 1;
+
+        long startDate = DateTimeUtils.DateTimeStringToMillis(mStartDateTextView.getText().toString().trim());
+        long endDate = DateTimeUtils.DateTimeStringToMillis(mEndDateTextView.getText().toString().trim());
+
+        if(!(name.isEmpty() || description.isEmpty() || startDate == 0 || endDate == 0)) {
+
+            ContentValues values = new ContentValues();
+            values.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
+            values.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
+            values.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, frequency);
+            values.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, startDate);
+            values.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, endDate);
 
 
+            int result = MedicationDbUtils.updateMedication(mContext, id, values);
+
+            if (result > 0) {
+                Toast.makeText(mContext, "Medication edited successfully", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(mContext, "Unable to edit medication", Toast.LENGTH_SHORT).show();
+            }
+        }
 
 
-
+    }
 
 }

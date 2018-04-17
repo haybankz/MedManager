@@ -1,5 +1,6 @@
 package com.haybankz.medmanager.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.haybankz.medmanager.listener.RecyclerTouchListener;
 import com.haybankz.medmanager.loader.ReminderLoader;
 import com.haybankz.medmanager.model.Medication;
 import com.haybankz.medmanager.model.Reminder;
+import com.haybankz.medmanager.util.ReminderDbUtils;
 
 import java.util.ArrayList;
 
@@ -94,6 +96,13 @@ public class ReminderListFragment extends Fragment implements LoaderManager.Load
 
         mNoReminderLayout = view.findViewById(R.id.linear_layout_no_med_rem);
 
+        mNoReminderLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "View clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         mReminderRecyclerView = view.findViewById(R.id.recycler_reminder);
 
         StaggeredGridLayoutManager staggeredGridLayoutManager =
@@ -122,6 +131,7 @@ public class ReminderListFragment extends Fragment implements LoaderManager.Load
 //            }
 //        }));
 
+
         getLoaderManager().initLoader(REMINDER_LOADER, null, this);
 
         return view;
@@ -139,15 +149,25 @@ public class ReminderListFragment extends Fragment implements LoaderManager.Load
 //    @Override
 //    public void onAttach(Context context) {
 //        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-////            throw new RuntimeException(context.toString()
-////                    + " must implement OnFragmentInteractionListener");
+////        if (context instanceof OnFragmentInteractionListener) {
+////            mListener = (OnFragmentInteractionListener) context;
+////        } else {
+//////            throw new RuntimeException(context.toString()
+//////                    + " must implement OnFragmentInteractionListener");
+////        }
+//        if (mReminderRecyclerAdapter != null) {
+//
+//            mReminderRecyclerAdapter.notifyDataSetChanged();
 //        }
 //    }
 
 //    @Override
+//    public void onResume() {
+//        super.onResume();
+////        mReminderRecyclerAdapter.notifyDataSetChanged();
+//    }
+
+    //    @Override
 //    public void onDetach() {
 //        super.onDetach();
 //        mListener = null;
@@ -177,14 +197,24 @@ public class ReminderListFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Reminder>> loader, ArrayList<Reminder> data) {
 
-        if (data != null) {
+        if (data != null && data.size() > 0) {
 
             mNoReminderLayout.setVisibility(View.GONE);
 
             // add data ro recycler adapter
             mReminderRecyclerAdapter.addAll(data);
-
+            int position = 0;
+            ArrayList<Reminder> reminders = ReminderDbUtils.getAllRemindersThatRangBeforeCurrentTime(getContext());
+            if(reminders != null) {
+                position = reminders.size();
+                mReminderRecyclerView.scrollToPosition(position);
+            }
+            mReminderRecyclerAdapter.notifyDataSetChanged();
             mReminderRecyclerView.setVisibility(View.VISIBLE);
+
+        }else{
+            mReminderRecyclerView.setVisibility(View.GONE);
+            mNoReminderLayout.setVisibility(View.VISIBLE);
 
         }
     }

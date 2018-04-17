@@ -155,6 +155,7 @@ public class MedicationRecyclerAdapter extends RecyclerView.Adapter<MedicationRe
 
             if(medication.isActive()) {
                 mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary));
+
             }else{
                 mMedActiveImageView.setColorFilter(ContextCompat.getColor(context, android.R.color.darker_gray));
                 }

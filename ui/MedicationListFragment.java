@@ -1,10 +1,16 @@
 package com.haybankz.medmanager.ui;
 
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -12,15 +18,21 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.haybankz.medmanager.adapter.MedicationCursorAdapter;
+import com.haybankz.medmanager.data.medication.MedicationContract;
 import com.haybankz.medmanager.listener.ClickListener;
-import com.haybankz.medmanager.loader.MedicationLoader;
+
 import com.haybankz.medmanager.R;
 import com.haybankz.medmanager.listener.RecyclerTouchListener;
 import com.haybankz.medmanager.adapter.MedicationRecyclerAdapter;
 import com.haybankz.medmanager.model.Medication;
+import com.haybankz.medmanager.data.medication.MedicationContract.MedicationEntry;
+import com.haybankz.medmanager.util.MedicationDbUtils;
 
 import java.util.ArrayList;
 
@@ -33,7 +45,10 @@ import java.util.ArrayList;
  * Use the {@link MedicationListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MedicationListFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<Medication>>{
+public class MedicationListFragment extends Fragment implements
+//        LoaderManager.LoaderCallbacks<ArrayList<Medication>>
+        LoaderManager.LoaderCallbacks<Cursor>
+{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -43,8 +58,12 @@ public class MedicationListFragment extends Fragment implements LoaderManager.Lo
     private String mParam1;
     private String mParam2;
 
-    LinearLayout mNoMedicationLayout;
+//    LinearLayout mNoMedicationLayout;
     RecyclerView mMedicationRecyclerView;
+
+    ListView medicationList;
+    MedicationCursorAdapter adapter;
+    View emptyView;
 
     MedicationRecyclerAdapter mMedicationRecyclerAdapter;
 
@@ -91,74 +110,103 @@ public class MedicationListFragment extends Fragment implements LoaderManager.Lo
         View view = inflater.inflate(R.layout.fragment_medication_list, container, false);
 
 
-        mNoMedicationLayout = view.findViewById(R.id.linear_layout_no_med);
+//        mNoMedicationLayout = view.findViewById(R.id.linear_layout_no_med);
 
-        mMedicationRecyclerView = view.findViewById(R.id.recycler_medication);
+//        mMedicationRecyclerView = view.findViewById(R.id.recycler_medication);
+//
+//
+//
+//        StaggeredGridLayoutManager staggeredGridLayoutManager =
+//                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+//
+//        mMedicationRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+//        mMedicationRecyclerAdapter = new MedicationRecyclerAdapter(getContext(), new ArrayList<Medication>());
+//
+//        mMedicationRecyclerView.setAdapter(mMedicationRecyclerAdapter);
+//        mMedicationRecyclerView.addItemDecoration(new DividerItemDecoration(mMedicationRecyclerView.getContext(), StaggeredGridLayoutManager.VERTICAL));
+//
+//        mMedicationRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), mMedicationRecyclerView, new ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//
+//                Medication medication = mMedicationRecyclerAdapter.getItem(position);
+//                Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, medication.getId());
+//
+//                Intent openViewMedicationActivityIntent = new Intent(getContext(), ViewMedicationActivity.class);
+//                openViewMedicationActivityIntent.setData(uri);
+//                getActivity().finish();
+//                startActivity(openViewMedicationActivityIntent);
+//
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//        }));
+
+//        getLoaderManager().initLoader(MED_LOADER, null, this);
 
 
 
-        StaggeredGridLayoutManager staggeredGridLayoutManager =
-                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
 
-        mMedicationRecyclerView.setLayoutManager(staggeredGridLayoutManager);
-        mMedicationRecyclerAdapter = new MedicationRecyclerAdapter(getContext(), new ArrayList<Medication>());
+        medicationList = view.findViewById(R.id.list_view_medication);
+        adapter = new MedicationCursorAdapter(getContext(), null);
+        medicationList.setAdapter(adapter);
+        getLoaderManager().initLoader(122, null, this);
 
-        mMedicationRecyclerView.setAdapter(mMedicationRecyclerAdapter);
-        mMedicationRecyclerView.addItemDecoration(new DividerItemDecoration(mMedicationRecyclerView.getContext(), StaggeredGridLayoutManager.VERTICAL));
-
-        mMedicationRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), mMedicationRecyclerView, new ClickListener() {
+        medicationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view, int position) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Toast.makeText(getContext(), mMedicationRecyclerAdapter.getItem(position).toString(), Toast.LENGTH_SHORT).show();
+                Uri uri = ContentUris.withAppendedId(MedicationEntry.CONTENT_URI, id);
+
+                Intent openViewMedicationActivityIntent = new Intent(getContext(), ViewMedicationActivity.class);
+                openViewMedicationActivityIntent.setData(uri);
+                startActivity(openViewMedicationActivityIntent);
+
 
             }
+        });
 
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
-
-        getLoaderManager().initLoader(MED_LOADER, null, this);
-
-
+        emptyView = view.findViewById(R.id.linear_layout_no_med);
+        medicationList.setEmptyView(emptyView);
 
         return view;
     }
 
 
-    @NonNull
-    @Override
-    public Loader<ArrayList<Medication>> onCreateLoader(int id, @Nullable Bundle args) {
-
-        return new MedicationLoader(getContext());
-
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<Medication>> loader, ArrayList<Medication> data) {
-
-        if (data != null) {
-
-            mNoMedicationLayout.setVisibility(View.GONE);
-
-            // add data ro recycler adapter
-            mMedicationRecyclerAdapter.addAll(data);
-
-            mMedicationRecyclerView.setVisibility(View.VISIBLE);
-
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<Medication>> loader) {
-
-        mMedicationRecyclerAdapter.clear();
-        mMedicationRecyclerAdapter.notifyDataSetChanged();
-
-    }
+//    @NonNull
+//    @Override
+//    public Loader<ArrayList<Medication>> onCreateLoader(int id, @Nullable Bundle args) {
+//
+//        return new MedicationLoader(getContext());
+//
+//    }
+//
+//    @Override
+//    public void onLoadFinished(@NonNull Loader<ArrayList<Medication>> loader, ArrayList<Medication> data) {
+//
+//        if (data != null) {
+//
+//            mNoMedicationLayout.setVisibility(View.GONE);
+//
+//            // add data ro recycler adapter
+//            mMedicationRecyclerAdapter.addAll(data);
+//
+//            mMedicationRecyclerView.setVisibility(View.VISIBLE);
+//
+//        }
+//
+//    }
+//
+//    @Override
+//    public void onLoaderReset(@NonNull Loader<ArrayList<Medication>> loader) {
+//
+//        mMedicationRecyclerAdapter.clear();
+//        mMedicationRecyclerAdapter.notifyDataSetChanged();
+//
+//    }
 
     // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
@@ -170,15 +218,26 @@ public class MedicationListFragment extends Fragment implements LoaderManager.Lo
 //    @Override
 //    public void onAttach(Context context) {
 //        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
+////        if (context instanceof OnFragmentInteractionListener) {
+////            mListener = (OnFragmentInteractionListener) context;
+////        } else {
+////            throw new RuntimeException(context.toString()
+////                    + " must implement OnFragmentInteractionListener");
+////        }
+//
+//        if(mMedicationRecyclerAdapter != null){
+//            mMedicationRecyclerAdapter.notifyDataSetChanged();
 //        }
+//
 //    }
 
 //    @Override
+//    public void onResume() {
+//        super.onResume();
+////        mMedicationRecyclerAdapter.notifyDataSetChanged();
+//    }
+
+    //    @Override
 //    public void onDetach() {
 //        super.onDetach();
 //        mListener = null;
@@ -198,4 +257,43 @@ public class MedicationListFragment extends Fragment implements LoaderManager.Lo
 //        // TODO: Update argument type and name
 //        void onFragmentInteraction(Uri uri);
 //    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String[] projection = {MedicationEntry._ID,
+                MedicationEntry.COLUMN_MEDICATION_NAME,
+                MedicationEntry.COLUMN_MEDICATION_DESCRIPTION,
+                MedicationEntry.COLUMN_MEDICATION_DOSAGE,
+                MedicationEntry.COLUMN_MEDICATION_FREQUENCY,
+                MedicationEntry.COLUMN_MEDICATION_START_DATE,
+                MedicationEntry.COLUMN_MEDICATION_END_DATE,
+                MedicationEntry.COLUMN_MEDICATION_ACTIVE
+        };
+
+        String sortOrder = MedicationEntry._ID + " DESC";
+
+        return new CursorLoader(getContext(),
+               MedicationEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                sortOrder);
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        adapter.swapCursor(data);
+
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        adapter.swapCursor(null);
+    }
 }

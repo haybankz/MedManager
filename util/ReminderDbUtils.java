@@ -70,12 +70,30 @@ public class ReminderDbUtils {
         return updateReminder(context, id, values);
     }
 
+    public static int ReminderRefuse(Context context, long id){
+        ContentValues values = new ContentValues();
+        values.put(ReminderEntry.COLUMN_REMINDER_TAKEN, 0);
+
+        return updateReminder(context, id, values);
+    }
+
     public static int deleteReminder(Context context, long id){
 
         Uri uri = ContentUris.withAppendedId(ReminderEntry.CONTENT_URI, id);
 
         return context.getContentResolver().delete(uri, null, null);
     }
+
+
+    public static int deleteRemindersOfMedication(Context context, long medicationId){
+
+        String selection = ReminderEntry.COLUMN_MEDICATION_ID + "=?";
+        String[] selectionArgs = {String.valueOf(medicationId)};
+
+
+        return context.getContentResolver().delete(ReminderEntry.CONTENT_URI, selection, selectionArgs);
+    }
+
 
 
     public static Uri insertReminder(Context context, ContentValues values){
@@ -85,8 +103,10 @@ public class ReminderDbUtils {
 
         if(uri != null){
             long startTimeDateInMillis = values.getAsLong(ReminderEntry.COLUMN_REMINDER_DATE_TIME);
-            int id = (int) ContentUris.parseId(uri);
-//            new AlarmReceiver().setAlarm(context, startTimeDateInMillis, id);
+            if(startTimeDateInMillis < Calendar.getInstance().getTimeInMillis()) {
+                int id = (int) ContentUris.parseId(uri);
+                new AlarmReceiver().setAlarm(context, startTimeDateInMillis, id);
+            }
         }
 
 
@@ -162,6 +182,46 @@ public class ReminderDbUtils {
     }
 
 
+    public static ArrayList<Reminder> getAllRemindersThatRangBeforeCurrentTime(Context context){
+        ArrayList<Reminder> reminders = new ArrayList<>();
+        String[] projection = {
+                ReminderEntry._ID,
+                ReminderEntry.COLUMN_MEDICATION_ID,
+                ReminderEntry.COLUMN_REMINDER_DATE_TIME,
+                ReminderEntry.COLUMN_REMINDER_TAKEN
+        };
+
+        long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
+
+        String selection = ReminderEntry.COLUMN_REMINDER_DATE_TIME + "< ?";
+        String[] selectionArgs = {String.valueOf(currentTimeInMillis)};
+
+
+
+        Cursor c = context.getContentResolver().query(ReminderEntry.CONTENT_URI, projection, selection,
+                selectionArgs, null);
+
+        if( c != null ){
+
+            while(c.moveToNext()){
+                long id = c.getLong(c.getColumnIndexOrThrow(ReminderEntry._ID));
+                long medicationId = c.getLong(c.getColumnIndexOrThrow(ReminderEntry.COLUMN_MEDICATION_ID));
+                long reminderDateTime = c.getLong(c.getColumnIndexOrThrow(ReminderEntry.COLUMN_REMINDER_DATE_TIME));
+                boolean taken = c.getInt(c.getColumnIndexOrThrow(ReminderEntry.COLUMN_REMINDER_TAKEN)) == 1;
+                Reminder reminder = new Reminder(id, medicationId, reminderDateTime, taken);
+
+                reminders.add(reminder);
+
+            }
+            c.close();
+
+            return reminders;
+        }
+
+        return null;
+    }
+
+
     public static ArrayList<Reminder> getAllReminders(Context context){
         ArrayList<Reminder> reminders = new ArrayList<>();
         String[] projection = {
@@ -180,6 +240,7 @@ public class ReminderDbUtils {
 
         if( c != null ){
 
+
             while(c.moveToNext()){
                 long id = c.getLong(c.getColumnIndexOrThrow(ReminderEntry._ID));
                 long medicationId = c.getLong(c.getColumnIndexOrThrow(ReminderEntry.COLUMN_MEDICATION_ID));
@@ -195,7 +256,7 @@ public class ReminderDbUtils {
 
         }
 
-        if(reminders.size() == 1){
+        if(reminders.size() == 0){
             reminders = null;
         }
 

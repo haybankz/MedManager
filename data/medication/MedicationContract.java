@@ -23,6 +23,7 @@ public class MedicationContract {
         public final static String _ID = BaseColumns._ID;
         public final static String COLUMN_MEDICATION_NAME = "name";
         public final static String COLUMN_MEDICATION_DESCRIPTION = "description";
+        public final static String COLUMN_MEDICATION_DOSAGE = "dosage";
         public final static String COLUMN_MEDICATION_FREQUENCY = "frequency";
         public final static String COLUMN_MEDICATION_START_DATE = "start_date";
         public final static String COLUMN_MEDICATION_END_DATE = "end_date";
