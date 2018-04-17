@@ -1,7 +1,5 @@
 package com.haybankz.medmanager.util;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by LENOVO on 3/25/2018.
  */

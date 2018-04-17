@@ -22,6 +22,8 @@ import com.haybankz.medmanager.data.medication.MedicationContract;
 import com.haybankz.medmanager.util.Constant;
 import com.haybankz.medmanager.util.DateTimeUtils;
 import com.haybankz.medmanager.util.MedicationDbUtils;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 public class MedicationCursorAdapter extends CursorAdapter {
 
@@ -57,6 +59,14 @@ public class MedicationCursorAdapter extends CursorAdapter {
 
         mNameTextView.setText(name);
         mDescriptionTextView.setText(description);
+
+        Picasso.with(context)
+                .load("file:///android_asset/img/pill.png")
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .transform(new PicassoCircleTransformation())
+                .fit()
+                .noFade()
+                .into(mMedTypeImageView);
 
         String interval = "";
         switch (frequency){

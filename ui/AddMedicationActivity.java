@@ -174,7 +174,7 @@ public class AddMedicationActivity extends AppCompatActivity {
                 Uri medicationUri = MedicationDbUtils.insertMedication(mContext, contentValues);
                 Log.e(TAG, "addMedication: " + contentValues.toString());
 
-               
+               finish();
 
             } else {
                 Toast.makeText(mContext, "Please fill details properly", Toast.LENGTH_SHORT).show();

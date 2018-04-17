@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         GoogleSignInOptions mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.web_client_id))
+
                 .requestEmail()
                 .build();
 
@@ -239,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         searchViewItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchViewItem.getActionView();
-//        ImageView v =  searchView.findViewById(android.support.v7.appcompat.R.id.search_button);
         final TextView searchTextView = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchTextView.setBackgroundColor(getResources().getColor(R.color.white));
         searchTextView.setTextColor(getResources().getColor(R.color.black));

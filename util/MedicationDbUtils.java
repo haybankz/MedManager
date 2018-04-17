@@ -72,7 +72,7 @@ public class MedicationDbUtils {
         };
 
         String selection = MedicationEntry.COLUMN_MEDICATION_NAME + " like ?";
-        String[] selectionArgs = new String[]{s +"%"};
+        String[] selectionArgs = new String[]{"%" + s + "%"};
         String sortOrder = MedicationEntry.COLUMN_MEDICATION_NAME + " ASC";
 
 

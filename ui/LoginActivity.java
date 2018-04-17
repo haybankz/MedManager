@@ -74,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
         GoogleSignInOptions mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.web_client_id))
                 .requestEmail()
                 .build();
 
@@ -205,9 +204,6 @@ public class LoginActivity extends AppCompatActivity {
                 try{
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     Log.e(TAG, "handleSignInResult: Account: "+account.toString() );
-
-//                    Toast.makeText(LoginActivity.this,"handleSignInResult: Account: "
-//                            + account.getDisplayName() , Toast.LENGTH_SHORT).show();
 
                     User user = UserDbUtils.loginUser(mContext, account.getEmail());
 
