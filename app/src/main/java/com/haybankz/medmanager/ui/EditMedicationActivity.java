@@ -99,6 +99,7 @@ public class EditMedicationActivity extends AppCompatActivity {
         mFrequencySpinner.setAdapter(aAdpt);
 
 
+        mFrequencySpinner.setEnabled(false);
 
 
 

@@ -165,7 +165,7 @@ public class AddMedicationActivity extends AppCompatActivity {
 
                 contentValues.put(MedicationEntry.COLUMN_MEDICATION_NAME, name);
                 contentValues.put(MedicationEntry.COLUMN_MEDICATION_DESCRIPTION, description);
-                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DOSAGE, "Take 100");
+                contentValues.put(MedicationEntry.COLUMN_MEDICATION_DOSAGE, "Take 1");
                 contentValues.put(MedicationEntry.COLUMN_MEDICATION_FREQUENCY, frequency);
                 contentValues.put(MedicationEntry.COLUMN_MEDICATION_START_DATE, mStartDateTimeInMillis);
                 contentValues.put(MedicationEntry.COLUMN_MEDICATION_END_DATE, mEndDateTimeInMillis);
