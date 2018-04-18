@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.haybankz.medmanager">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".ui.AddMedicationActivity">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".ui.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity android:name=".ui.LoginActivity">
+            <intent-filter>
+                -->
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- register MedicationProvider class as content provider for medication database -->
+        <provider
+            android:name=".data.medication.MedicationProvider"
+            android:authorities="com.haybankz.medmanager.medication"
+            android:exported="false" />
+
+        <!-- register ReminderProvider class as content provider for medication database -->
+        <provider
+            android:name=".data.reminder.ReminderProvider"
+            android:authorities="com.haybankz.medmanager.reminder"
+            android:exported="false" />
+
+        <!-- register UserProvider class as content provider for medication database -->
+        <provider
+            android:name=".data.user.UserProvider"
+            android:authorities="com.haybankz.medmanager.user"
+            android:exported="false" />
+
+        <receiver android:name=".receiver.AlarmReceiver" />
+        <receiver android:name=".receiver.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".ui.ViewMedicationActivity" />
+        <activity android:name=".ui.EditMedicationActivity" />
+        <activity android:name=".ui.SignUpActivity" />
+        <activity android:name=".ui.UpdateUserActivity"></activity>
+    </application>
+
+</manifest>

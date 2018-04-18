@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    
+    <!--<android.support.v7.widget.CardView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="4dp"-->
+        <!--android:focusable="true"-->
+        <!--android:clickable="true"-->
+        <!--app:cardCornerRadius="6dp"-->
+        <!--app:cardElevation="4dp">-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="8dp">
+
+            <!--<android.support.v4.widget.CircleImageView-->
+                <!--android:id="@+id/img_med_type"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentStart="true"-->
+                <!--android:layout_marginEnd="8dp"-->
+                <!--android:layout_marginStart="4dp"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:scaleType="centerInside"-->
+                <!--android:fadingEdge="vertical|horizontal"-->
+                <!--android:src="@mipmap/ic_launcher_round" />-->
+
+            <ImageView
+                android:id="@+id/img_med_type"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@mipmap/ic_launcher_round"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="0dp"
+                android:scaleType="centerCrop"/>
+
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/img_med_active"
+                android:background="?android:attr/selectableItemBackground"
+                android:src="@android:drawable/ic_lock_idle_alarm"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:id="@+id/tv_med_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="4dp"
+                android:layout_toEndOf="@id/img_med_type"
+                android:layout_toStartOf="@id/img_med_active"
+                tools:text="Med name"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_med_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/img_med_type"
+                android:layout_below="@id/tv_med_name"
+                tools:text="Med description"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tv_med_dosage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/img_med_type"
+                android:layout_below="@id/tv_med_description"
+                tools:text="Med description"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tv_med_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_med_dosage"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_toEndOf="@id/img_med_type"
+                android:textSize="14sp"
+                tools:text="Interval" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_med_start_date"
+                android:layout_below="@id/tv_med_interval"
+                android:layout_toEndOf="@id/img_med_type"
+                tools:text="Start date"
+                android:textSize="14sp"
+                android:layout_marginEnd="4dp"/>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="18dp"
+                android:id="@+id/img_to"
+                android:src="@drawable/ic_arrow_forward"
+                android:layout_toEndOf="@+id/tv_med_start_date"
+                android:layout_below="@+id/tv_med_interval"/>
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_med_end_date"
+                android:layout_toEndOf="@id/img_to"
+                android:layout_below="@id/tv_med_interval"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_alignParentEnd="true"
+                android:textSize="14sp"
+                tools:text="End date" />
+
+
+        </RelativeLayout>
+
+
+    <!--</android.support.v7.widget.CardView>-->
+
+</LinearLayout>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="4dp"
+    android:layout_margin="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/background_shape_reminder">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/img_rem"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                app:srcCompat="@drawable/ic_home_black_24dp"
+                android:scaleType="center"
+                android:padding="4dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"/>
+
+
+
+            <TextView
+                android:id="@+id/tv_rem_med_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Text 3"
+                android:layout_toEndOf="@id/img_rem"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_rem_med_dosage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Text 4"
+                android:layout_toEndOf="@id/img_rem"
+                android:layout_below="@id/tv_rem_med_name"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_rem_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Text 4"
+                android:layout_toEndOf="@id/img_rem"
+                android:layout_below="@id/tv_rem_med_dosage"
+                android:textSize="14sp"/>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/darker_gray" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp">
+
+
+           <ImageView
+               android:id="@+id/img_rem_reschedule"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:scaleType="center"
+               android:src="@drawable/ic_reschedule"
+               android:layout_centerInParent="true"
+               android:layout_marginStart="50dp"
+               android:layout_marginEnd="50dp"
+               android:padding="6dp"/>
+
+            <ImageView
+                android:id="@+id/img_rem_take_med"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_take"
+                android:layout_toStartOf="@id/img_rem_reschedule"
+                android:layout_centerVertical="true"
+                android:padding="6dp"/>
+
+            <ImageView
+                android:id="@+id/img_rem_refuse_medic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                android:src="@drawable/ic_refuse"
+                android:layout_toEndOf="@id/img_rem_reschedule"
+                android:layout_centerVertical="true"
+                android:padding="6dp"/>
+
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>
