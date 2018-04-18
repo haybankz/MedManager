@@ -94,7 +94,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(Constant.REMINDER_ID, "" +id);
-        mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 //        long diffTime =  startDateTimeInMillis - Calendar.getInstance().getTimeInMillis();
 
@@ -116,7 +116,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(Constant.REMINDER_ID, "" + id);
-        mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        mPendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long diffTime =  startDateTimeInMillis - Calendar.getInstance().getTimeInMillis();
 

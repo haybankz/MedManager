@@ -101,11 +101,12 @@ public class ReminderDbUtils {
         Uri uri = context.getContentResolver().insert(ReminderEntry.CONTENT_URI, values);
         Log.e("ReminderDbUtils", "insertReminder: " + uri );
 
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
         if(uri != null){
             long startTimeDateInMillis = values.getAsLong(ReminderEntry.COLUMN_REMINDER_DATE_TIME);
-            if(startTimeDateInMillis < Calendar.getInstance().getTimeInMillis()) {
+            if(startTimeDateInMillis > Calendar.getInstance().getTimeInMillis()) {
                 int id = (int) ContentUris.parseId(uri);
-                new AlarmReceiver().setAlarm(context, startTimeDateInMillis, id);
+                alarmReceiver.setAlarm(context, startTimeDateInMillis, id);
             }
         }
 
